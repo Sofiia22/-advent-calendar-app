@@ -60,6 +60,14 @@ export const DAY_5 = {
     journey: "The land of Moriah — three days’ journey from Beersheba",
     lamb: "The Lord will provide — the ram caught in the thicket",
   },
+  experience: {
+    todaysQuestion:
+      "Can Abraham trust God when he does not understand His plan?",
+    todaysTruth:
+      "God can be trusted, even when we do not yet understand His plan.",
+    completedMessage: "You followed Abraham’s story and discovered how God provides.",
+    timeline: ["Abraham", "Isaac", "The promised Lamb", "Jesus"],
+  },
 } as const satisfies AdventStoryContent;
 
 export const DAY_5_BY_LANGUAGE = {

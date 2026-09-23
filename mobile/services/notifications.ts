@@ -29,7 +29,11 @@ export async function prepareNotifications() {
   return requestedPermission.status === "granted";
 }
 
-export async function scheduleDailyReminder(hour: number, minute: number) {
+export async function scheduleDailyReminder(
+  hour: number,
+  minute: number,
+  copy: { title: string; body: string },
+) {
   const hasPermission = await prepareNotifications();
 
   if (!hasPermission) {
@@ -38,8 +42,8 @@ export async function scheduleDailyReminder(hour: number, minute: number) {
 
   return Notifications.scheduleNotificationAsync({
     content: {
-      title: "Your Advent journey awaits ✦",
-      body: "Take a quiet moment for today’s Scripture story.",
+      title: copy.title,
+      body: copy.body,
       sound: true,
     },
     trigger: {
@@ -49,7 +53,7 @@ export async function scheduleDailyReminder(hour: number, minute: number) {
     },
   });
 }
-export async function scheduleTestNotification() {
+export async function scheduleTestNotification(copy: { title: string; body: string }) {
   const hasPermission = await prepareNotifications();
 
   if (!hasPermission) {
@@ -58,8 +62,8 @@ export async function scheduleTestNotification() {
 
   await Notifications.scheduleNotificationAsync({
     content: {
-      title: "The Promised Savior ✦",
-      body: "Your Advent journey is ready.",
+      title: copy.title,
+      body: copy.body,
       sound: true,
     },
     trigger: {

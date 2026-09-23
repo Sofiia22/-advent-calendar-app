@@ -16,7 +16,9 @@ type AdventContextValue = {
   completedDays: number[];
   currentDay: number;
   isHydrated: boolean;
+  isOnboarded: boolean;
   setLanguage: (language: LanguageId) => Promise<void>;
+  finishOnboarding: () => Promise<void>;
   completeDay: (day: number) => Promise<void>;
   isDayCompleted: (day: number) => boolean;
   resetProgress: () => Promise<void>;
@@ -28,9 +30,21 @@ type AdventProviderProps = {
 
 const LANGUAGE_KEY = "@advent/language";
 const COMPLETED_DAYS_KEY = "@advent/completed-days";
+const ONBOARDED_KEY = "@advent/onboarded";
 
-const DEFAULT_LANGUAGE: LanguageId = "en";
-const DEFAULT_COMPLETED_DAYS = [1, 2, 3, 4];
+function getDeviceLanguage(): LanguageId {
+  try {
+    const code = Intl.DateTimeFormat().resolvedOptions().locale.toLowerCase();
+    if (code.startsWith("en")) return "en";
+    if (code.startsWith("ru")) return "ru";
+  } catch {
+    // Ukrainian remains the product fallback when device locale is unavailable.
+  }
+  return "uk";
+}
+
+const DEFAULT_LANGUAGE: LanguageId = getDeviceLanguage();
+const DEFAULT_COMPLETED_DAYS: number[] = [];
 
 const AdventContext = createContext<AdventContextValue | undefined>(undefined);
 
@@ -74,6 +88,7 @@ export function AdventProvider({ children }: AdventProviderProps) {
   );
 
   const [isHydrated, setIsHydrated] = useState(false);
+  const [isOnboarded, setIsOnboarded] = useState(false);
 
   useEffect(() => {
     const loadStoredState = async () => {
@@ -81,16 +96,19 @@ export function AdventProvider({ children }: AdventProviderProps) {
         const storedValues = await AsyncStorage.multiGet([
           LANGUAGE_KEY,
           COMPLETED_DAYS_KEY,
+          ONBOARDED_KEY,
         ]);
 
         const storedLanguage = storedValues[0][1];
         const storedCompletedDays = storedValues[1][1];
+        const storedOnboarded = storedValues[2][1];
 
         if (isLanguage(storedLanguage)) {
           setSelectedLanguage(storedLanguage);
         }
 
         setCompletedDays(parseCompletedDays(storedCompletedDays));
+        setIsOnboarded(storedOnboarded === "true");
       } catch (error) {
         console.warn("Could not load Advent progress:", error);
       } finally {
@@ -99,6 +117,15 @@ export function AdventProvider({ children }: AdventProviderProps) {
     };
 
     void loadStoredState();
+  }, []);
+
+  const finishOnboarding = useCallback(async () => {
+    setIsOnboarded(true);
+    try {
+      await AsyncStorage.setItem(ONBOARDED_KEY, "true");
+    } catch (error) {
+      console.warn("Could not save onboarding state:", error);
+    }
   }, []);
 
   const setLanguage = useCallback(async (language: LanguageId) => {
@@ -111,25 +138,21 @@ export function AdventProvider({ children }: AdventProviderProps) {
     }
   }, []);
 
-  const completeDay = useCallback(
-    async (day: number) => {
-      const nextCompletedDays = completedDays.includes(day)
-        ? completedDays
-        : [...completedDays, day].sort((a, b) => a - b);
+  const completeDay = useCallback(async (day: number) => {
+    const firstIncomplete = Array.from({ length: 24 }, (_, index) => index + 1)
+      .find((candidate) => !completedDays.includes(candidate)) ?? 24;
+    const nextCompletedDays = day > firstIncomplete || completedDays.includes(day)
+      ? completedDays
+      : [...completedDays, day].sort((a, b) => a - b);
 
-      setCompletedDays(nextCompletedDays);
+    setCompletedDays(nextCompletedDays);
 
-      try {
-        await AsyncStorage.setItem(
-          COMPLETED_DAYS_KEY,
-          JSON.stringify(nextCompletedDays),
-        );
-      } catch (error) {
-        console.warn("Could not save Advent progress:", error);
-      }
-    },
-    [completedDays],
-  );
+    try {
+      await AsyncStorage.setItem(COMPLETED_DAYS_KEY, JSON.stringify(nextCompletedDays));
+    } catch (error) {
+      console.warn("Could not save Advent progress:", error);
+    }
+  }, [completedDays]);
   const isDayCompleted = useCallback(
     (day: number) => completedDays.includes(day),
     [completedDays],
@@ -145,7 +168,10 @@ export function AdventProvider({ children }: AdventProviderProps) {
     }
   }, []);
 
-  const currentDay = Math.min(completedDays.length + 1, 24);
+  const currentDay =
+    Array.from({ length: 24 }, (_, index) => index + 1).find(
+      (day) => !completedDays.includes(day),
+    ) ?? 24;
 
   const value = useMemo<AdventContextValue>(
     () => ({
@@ -153,7 +179,9 @@ export function AdventProvider({ children }: AdventProviderProps) {
       completedDays,
       currentDay,
       isHydrated,
+      isOnboarded,
       setLanguage,
+      finishOnboarding,
       completeDay,
       isDayCompleted,
       resetProgress,
@@ -163,7 +191,9 @@ export function AdventProvider({ children }: AdventProviderProps) {
       completedDays,
       currentDay,
       isHydrated,
+      isOnboarded,
       setLanguage,
+      finishOnboarding,
       completeDay,
       isDayCompleted,
       resetProgress,

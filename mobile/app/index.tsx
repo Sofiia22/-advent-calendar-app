@@ -8,7 +8,7 @@ import { Lora_400Regular_Italic } from "@expo-google-fonts/lora";
 import { LinearGradient } from "expo-linear-gradient";
 import { useFonts } from "expo-font";
 import { StatusBar } from "expo-status-bar";
-import { router } from "expo-router";
+import { Redirect, router } from "expo-router";
 import {
   ImageBackground,
   Pressable,
@@ -80,7 +80,7 @@ function FeatureRow({
 }
 
 export default function WelcomeScreen() {
-  const { selectedLanguage, isHydrated } = useAdvent();
+  const { selectedLanguage, isHydrated, isOnboarded, finishOnboarding } = useAdvent();
   const t = getTranslations(selectedLanguage);
 
   const [fontsLoaded] = useFonts({
@@ -94,11 +94,16 @@ export default function WelcomeScreen() {
     return <View style={styles.loadingScreen} />;
   }
 
+  if (isOnboarded) {
+    return <Redirect href="/home" />;
+  }
+
   const handleBegin = () => {
     router.push("/language");
   };
 
-  const handleSkip = () => {
+  const handleSkip = async () => {
+    await finishOnboarding();
     router.replace("/home");
   };
   return (
@@ -176,7 +181,7 @@ export default function WelcomeScreen() {
 
           <Text style={styles.title}>
             {t.welcomeTo}{"\n"}
-            <Text style={styles.titleStrong}>The Promised Savior</Text>
+            <Text style={styles.titleStrong}>{t.saviorName}</Text>
           </Text>
 
           <Text style={styles.subtitle}>{t.welcomeDescription}</Text>
@@ -227,7 +232,7 @@ export default function WelcomeScreen() {
             </LinearGradient>
           </Pressable>
 
-          <Pressable onPress={handleSkip} style={styles.skipButton}>
+          <Pressable onPress={() => void handleSkip()} style={styles.skipButton}>
             <Text style={styles.skipText}>{t.skipForNow}</Text>
           </Pressable>
 

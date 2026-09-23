@@ -65,6 +65,7 @@ export default function LanguageScreen() {
     selectedLanguage,
     setLanguage,
     isHydrated,
+    finishOnboarding,
   } = useAdvent();
   const t = getTranslations(selectedLanguage);
 
@@ -79,7 +80,8 @@ export default function LanguageScreen() {
     return <View style={styles.loadingScreen} />;
   }
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
+    await finishOnboarding();
     router.replace("/home");
   };
 
@@ -118,7 +120,7 @@ export default function LanguageScreen() {
 
           <View style={styles.appPill}>
             <Text style={styles.appPillCross}>✦</Text>
-            <Text style={styles.appPillText}>THE PROMISED SAVIOR</Text>
+            <Text style={styles.appPillText}>{t.saviorName.toUpperCase()}</Text>
           </View>
 
           <View style={styles.bethlehemStar}>
@@ -194,7 +196,7 @@ export default function LanguageScreen() {
           </View>
 
           <Pressable
-            onPress={handleContinue}
+            onPress={() => void handleContinue()}
             style={({ pressed }) => [
               styles.continueButton,
               pressed && styles.buttonPressed,

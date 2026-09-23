@@ -1,537 +1,160 @@
-import {
-  CrimsonPro_400Regular,
-  CrimsonPro_600SemiBold,
-  CrimsonPro_700Bold,
-} from "@expo-google-fonts/crimson-pro";
-import { Lora_400Regular_Italic } from "@expo-google-fonts/lora";
 import { Ionicons } from "@expo/vector-icons";
-import { useFonts } from "expo-font";
 import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import {
-  Alert,
-  ImageBackground,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Alert, ImageBackground, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { AdventDoor, DoorState } from "../components/advent/AdventDoor";
-import { ProgressCard } from "../components/advent/ProgressCard";
-import { router } from "expo-router";
-import { useAdvent } from "../state/AdventContext";
+import { PromiseTrail, MilestoneState } from "../components/journey/PromiseTrail";
+import { BottomNavigation } from "../components/navigation/BottomNavigation";
+import { getAdventDay } from "../data/adventDays";
 import { getTranslations } from "../i18n/translations";
-
-const COLORS = {
-  night: "#070E1B",
-  navy: "#0F2040",
-  blue: "#1F365C",
-  cream: "#F8F3E9",
-  card: "#FFFCF6",
-  gold: "#D4AF37",
-  lightGold: "#F5CE36",
-  olive: "#6F7843",
-  muted: "#817D75",
-  border: "#E8DEC9",
-};
-
-const DAYS = Array.from({ length: 24 }, (_, index) => index + 1);
-
-const DAY_ROWS = Array.from({ length: 6 }, (_, rowIndex) =>
-  DAYS.slice(rowIndex * 4, rowIndex * 4 + 4),
-);
+import { useAdvent } from "../state/AdventContext";
+import { colors, fonts, radius } from "../theme/tokens";
+import { useAppFonts } from "../theme/useAppFonts";
 
 const STARS = [
-  { top: 18, left: "7%", size: 2, opacity: 0.7 },
-  { top: 44, left: "16%", size: 3, opacity: 0.5 },
-  { top: 24, left: "29%", size: 2, opacity: 0.8 },
-  { top: 58, left: "42%", size: 3, opacity: 0.6 },
-  { top: 17, left: "56%", size: 4, opacity: 0.7 },
-  { top: 43, left: "68%", size: 2, opacity: 0.8 },
-  { top: 27, left: "81%", size: 3, opacity: 0.6 },
-  { top: 69, left: "91%", size: 2, opacity: 0.7 },
+  ["8%", 24, 2], ["17%", 72, 3], ["31%", 34, 2], ["45%", 91, 2],
+  ["57%", 20, 3], ["70%", 61, 2], ["82%", 30, 3], ["92%", 84, 2],
 ] as const;
 
-function getDoorState(
-  day: number,
-  completedDays: number[],
-  currentDay: number,
-): DoorState {
-  if (completedDays.includes(day)) {
-    return "completed";
-  }
-
-  if (day === currentDay) {
-    return "today";
-  }
-
-  return "locked";
-}
-
 export default function HomeScreen() {
-  const { completedDays, currentDay, isHydrated, selectedLanguage } =
-    useAdvent();
-
+  const { width } = useWindowDimensions();
+  const { completedDays, currentDay, isHydrated, selectedLanguage } = useAdvent();
+  const [fontsLoaded] = useAppFonts();
   const t = getTranslations(selectedLanguage);
+  const trailWidth = Math.min(width, 720);
+  const current = getAdventDay(currentDay);
 
-  const [fontsLoaded] = useFonts({
-    CrimsonPro_400Regular,
-    CrimsonPro_600SemiBold,
-    CrimsonPro_700Bold,
-    Lora_400Regular_Italic,
-  });
+  if (!fontsLoaded || !isHydrated) return <View style={styles.loading} />;
 
-  if (!fontsLoaded || !isHydrated) {
-    return <View style={styles.loadingScreen} />;
-  }
-
-  const openDay = (day: number) => {
-    if (day === 5) {
-      router.push("/day-5");
+  const openDay = (day: number, state: MilestoneState) => {
+    if (state === "locked") {
+      Alert.alert(t.notYetTitle, t.notYetMessage);
       return;
     }
-
-    Alert.alert(t.storyComingSoonTitle(day), t.storyComingSoon);
+    router.push(`/advent/${day}`);
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top"]}>
+    <SafeAreaView edges={["top"]} style={styles.safeArea}>
       <StatusBar style="light" />
-
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <LinearGradient
-          colors={[COLORS.night, "#0A1630", COLORS.navy]}
-          style={styles.header}
-        >
-          {STARS.map((star, index) => (
-            <View
-              key={index}
-              style={[
-                styles.star,
-                {
-                  top: star.top,
-                  left: star.left,
-                  width: star.size,
-                  height: star.size,
-                  opacity: star.opacity,
-                },
-              ]}
-            />
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <LinearGradient colors={["#213B69", "#426F9B", "#74B9D1"]} style={styles.header}>
+          <View style={[styles.headerBlob, styles.headerBlobLeft]} />
+          <View style={[styles.headerBlob, styles.headerBlobRight]} />
+          {STARS.map(([left, top, size], index) => (
+            <View key={index} style={[styles.star, { left, top, width: size, height: size }]} />
           ))}
-
-          <Pressable
-            onPress={() => router.push("./settings")}
-            style={styles.settingsButton}
-          >
-            <Ionicons name="settings-outline" size={22} color="#FFFFFF" />
-          </Pressable>
-
-          <Text style={styles.headerCross}>✦</Text>
-
-          <Text style={styles.headerTitle}>The Promised Savior</Text>
-
-          <Text style={styles.headerSubtitle}>{t.appSubtitle}</Text>
-
-          <View style={styles.todayJourney}>
-            <Text style={styles.todayJourneyText}>
-              {t.todaysJourney(currentDay)}
-            </Text>
+          <View style={styles.brandRow}>
+            <View style={styles.brandMark}><Text style={styles.brandStar}>✦</Text></View>
+            <View>
+              <Text style={styles.brandTitle}>{t.appName}</Text>
+              <Text style={styles.brandSubtitle}>{t.promiseTrail}</Text>
+            </View>
+          </View>
+          <View style={styles.progressRow}>
+            <View>
+              <Text style={styles.progressLabel}>{t.yourJourney}</Text>
+              <Text style={styles.progressValue}>{t.dayOf(currentDay, 24)}</Text>
+            </View>
+            <View style={styles.progressStars}>
+              {Array.from({ length: 8 }, (_, index) => (
+                <Text key={index} style={[styles.progressStar, index < Math.ceil((completedDays.length / 24) * 8) && styles.progressStarLit]}>✦</Text>
+              ))}
+            </View>
           </View>
         </LinearGradient>
 
-        <View style={styles.content}>
-          <ImageBackground
-            source={require("../assets/images/bethlehem-night.jpg")}
-            style={styles.hero}
-            imageStyle={styles.heroImage}
-          >
-            <LinearGradient
-              colors={[
-                "rgba(7,14,27,0.30)",
-                "rgba(7,14,27,0.08)",
-                "rgba(7,14,27,0.90)",
-              ]}
-              style={StyleSheet.absoluteFill}
-            />
-
-            <View style={styles.warmHorizon} />
-
-            <View style={styles.bethlehemStar}>
-              <View style={styles.verticalRay} />
-              <View style={styles.horizontalRay} />
-              <View style={styles.starCore} />
+        <ImageBackground source={require("../assets/images/promise-trail-hero-v2.png")} style={styles.destination} imageStyle={styles.destinationImage}>
+          <LinearGradient colors={["rgba(16,26,58,0.02)", "rgba(16,26,58,0.08)", "rgba(16,26,58,0.58)"]} locations={[0, 0.55, 1]} style={StyleSheet.absoluteFill} />
+          <View style={styles.destinationCopy}>
+            <View style={styles.destinationPill}>
+              <Text style={styles.destinationEyebrow}>{t.destination}</Text>
             </View>
-
-            <View style={styles.heroText}>
-              <View style={styles.heroCopy}>
-                <Text style={styles.heroTitle}>{t.bethlehemTitle}</Text>
-
-                <Text style={styles.heroReference}>
-                  {t.bethlehemReference}
-                </Text>
-              </View>
-              <Pressable
-                onPress={() => openDay(currentDay)}
-                style={styles.dayChip}
-              >
-                <Text style={styles.dayChipText}>
-                  {t.dayLabel(currentDay)}
-                </Text>
-                <Ionicons
-                  name="chevron-forward"
-                  size={15}
-                  color={COLORS.night}
-                />
-              </Pressable>
-            </View>
-          </ImageBackground>
-
-          <View style={styles.calendarHeading}>
-            <View>
-              <Text style={styles.sectionEyebrow}>
-                {t.adventCalendar}
-              </Text>
-
-              <Text style={styles.sectionTitle}>{t.december2026}</Text>
-            </View>
-
-            <View style={styles.legend}>
-              <View style={styles.legendRow}>
-                <View style={[styles.legendDoor, styles.legendCompleted]} />
-                <Text style={styles.legendText}>{t.done}</Text>
-              </View>
-
-              <View style={styles.legendRow}>
-                <View style={[styles.legendDoor, styles.legendToday]} />
-                <Text style={styles.legendText}>{t.today}</Text>
-              </View>
-
-              <View style={styles.legendRow}>
-                <View style={[styles.legendDoor, styles.legendLocked]} />
-                <Text style={styles.legendText}>{t.locked}</Text>
-              </View>
-            </View>
+            <Text style={styles.destinationTitle}>{completedDays.length === 24 ? t.promisedSavior : t.destinationHidden}</Text>
           </View>
+        </ImageBackground>
 
-          <View style={styles.calendarBoard}>
-            {DAY_ROWS.map((row, rowIndex) => (
-              <View key={rowIndex} style={styles.calendarRow}>
-                {row.map((day) => {
-                  const state = getDoorState(day, completedDays, currentDay);
-
-                  return (
-                    <AdventDoor
-                      key={day}
-                      day={day}
-                      state={state}
-                      onPress={() => openDay(day)}
-                    />
-                  );
-                })}
-              </View>
-            ))}
+        <View style={styles.intro}>
+          <Text style={styles.eyebrow}>{t.promiseTrail}</Text>
+          <Text style={styles.heading}>{t.followThePromise}</Text>
+          <Text style={styles.description}>{t.trailDescription}</Text>
+          <View style={styles.currentCard}>
+            <View style={styles.currentSymbol}><Text style={styles.currentSymbolText}>{current?.symbol}</Text></View>
+            <View style={styles.currentCopy}>
+              <Text style={styles.currentLabel}>{t.currentStop}</Text>
+              <Text style={styles.currentTitle}>{current?.title[selectedLanguage]}</Text>
+            </View>
+            <Pressable onPress={() => openDay(currentDay, "current")} accessibilityRole="button" accessibilityLabel={t.openTodaysStory} style={({ pressed }) => [styles.continueButton, pressed && styles.pressed]}>
+              <Ionicons name="arrow-forward" size={21} color={colors.navy} />
+            </Pressable>
           </View>
+        </View>
 
-          <ProgressCard
+        <View style={styles.trailShell}>
+          <PromiseTrail
+            width={trailWidth}
             currentDay={currentDay}
-            completedDays={completedDays.length}
+            completedDays={completedDays}
+            language={selectedLanguage}
+            labels={{ day: t.dayLabel, current: t.today, completed: t.done, locked: t.locked }}
+            onDayPress={openDay}
           />
-
-          <Pressable
-            onPress={() => openDay(currentDay)}
-            style={({ pressed }) => [
-              styles.primaryButton,
-              pressed && styles.buttonPressed,
-            ]}
-          >
-            <LinearGradient
-              colors={[COLORS.lightGold, COLORS.gold]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.primaryGradient}
-            >
-              <Ionicons name="book-outline" size={21} color={COLORS.night} />
-
-              <Text style={styles.primaryText}>
-                {t.openTodaysStory}
-              </Text>
-
-              <Ionicons name="arrow-forward" size={20} color={COLORS.night} />
-            </LinearGradient>
-          </Pressable>
-
-          <Text style={styles.footer}>{t.footer}</Text>
+          <View style={styles.trailEnd}>
+            <Text style={styles.trailEndStar}>✦</Text>
+            <Text style={styles.trailEndTitle}>{t.thePromiseAwaits}</Text>
+            <Text style={styles.trailEndText}>{t.oneDayAtATime}</Text>
+          </View>
         </View>
       </ScrollView>
+      <BottomNavigation />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: COLORS.night,
-  },
-  loadingScreen: {
-    flex: 1,
-    backgroundColor: COLORS.cream,
-  },
-  scrollView: {
-    flex: 1,
-    backgroundColor: COLORS.cream,
-  },
-  scrollContent: {
-    paddingBottom: 34,
-  },
-  header: {
-    height: 244,
-    alignItems: "center",
-    paddingTop: 21,
-    overflow: "hidden",
-  },
-  star: {
-    position: "absolute",
-    borderRadius: 10,
-    backgroundColor: "#FFFFFF",
-  },
-  settingsButton: {
-    position: "absolute",
-    top: 17,
-    right: 18,
-    width: 42,
-    height: 42,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 21,
-    backgroundColor: "rgba(255,255,255,0.08)",
-  },
-  headerCross: {
-    color: COLORS.gold,
-    fontSize: 27,
-  },
-  headerTitle: {
-    marginTop: 7,
-    color: "#FFFFFF",
-    fontFamily: "CrimsonPro_700Bold",
-    fontSize: 34,
-    textAlign: "center",
-  },
-  headerSubtitle: {
-    marginTop: 5,
-    color: "rgba(255,255,255,0.64)",
-    fontFamily: "Lora_400Regular_Italic",
-    fontSize: 12,
-  },
-  todayJourney: {
-    marginTop: 19,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: "rgba(245,206,54,0.52)",
-    borderRadius: 999,
-    backgroundColor: "rgba(7,14,27,0.42)",
-  },
-  todayJourneyText: {
-    color: "#EAD36F",
-    fontFamily: "CrimsonPro_600SemiBold",
-    fontSize: 10,
-    letterSpacing: 1.3,
-  },
-  content: {
-    paddingHorizontal: 16,
-  },
-  hero: {
-    height: 225,
-    marginTop: -48,
-    overflow: "hidden",
-    borderRadius: 25,
-    justifyContent: "flex-end",
-    shadowColor: COLORS.night,
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.3,
-    shadowRadius: 18,
-    elevation: 8,
-  },
-  heroImage: {
-    borderRadius: 25,
-  },
-  warmHorizon: {
-    position: "absolute",
-    left: 80,
-    right: 20,
-    bottom: -65,
-    height: 150,
-    borderRadius: 100,
-    backgroundColor: "rgba(227,157,46,0.25)",
-  },
-  bethlehemStar: {
-    position: "absolute",
-    top: 24,
-    right: 34,
-    width: 52,
-    height: 52,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  verticalRay: {
-    position: "absolute",
-    width: 2,
-    height: 52,
-    backgroundColor: "rgba(255,225,117,0.82)",
-  },
-  horizontalRay: {
-    position: "absolute",
-    width: 52,
-    height: 2,
-    backgroundColor: "rgba(255,225,117,0.82)",
-  },
-  starCore: {
-    width: 9,
-    height: 9,
-    borderRadius: 5,
-    backgroundColor: "#FFF9D8",
-    shadowColor: COLORS.lightGold,
-    shadowOpacity: 1,
-    shadowRadius: 14,
-  },
-  heroText: {
-    flexDirection: "row",
-    alignItems: "flex-end",
-    padding: 16,
-  },
-  heroCopy: {
-    flex: 1,
-    paddingRight: 10,
-  },
-  heroTitle: {
-    color: "#FFFFFF",
-    fontFamily: "CrimsonPro_600SemiBold",
-    fontSize: 19,
-  },
-  heroReference: {
-    marginTop: 4,
-    color: "#D8BD57",
-    fontFamily: "CrimsonPro_600SemiBold",
-    fontSize: 10,
-    letterSpacing: 1.2,
-  },
-  dayChip: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 3,
-    paddingHorizontal: 13,
-    paddingVertical: 9,
-    borderRadius: 999,
-    backgroundColor: COLORS.gold,
-  },
-  dayChipText: {
-    color: COLORS.night,
-    fontFamily: "CrimsonPro_700Bold",
-    fontSize: 13,
-  },
-  calendarHeading: {
-    marginTop: 29,
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-  },
-  sectionEyebrow: {
-    color: COLORS.olive,
-    fontFamily: "CrimsonPro_600SemiBold",
-    fontSize: 11,
-    letterSpacing: 1.7,
-  },
-  sectionTitle: {
-    marginTop: 5,
-    color: COLORS.navy,
-    fontFamily: "CrimsonPro_600SemiBold",
-    fontSize: 22,
-  },
-  legend: {
-    gap: 5,
-  },
-  legendRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-end",
-    gap: 6,
-  },
-  legendDoor: {
-    width: 14,
-    height: 18,
-    borderTopLeftRadius: 7,
-    borderTopRightRadius: 7,
-    borderBottomLeftRadius: 3,
-    borderBottomRightRadius: 3,
-  },
-  legendCompleted: {
-    backgroundColor: COLORS.navy,
-  },
-  legendToday: {
-    backgroundColor: COLORS.gold,
-  },
-  legendLocked: {
-    borderWidth: 1,
-    borderColor: "rgba(15,32,64,0.12)",
-    backgroundColor: "#F1E8D8",
-  },
-  legendText: {
-    color: COLORS.muted,
-    fontFamily: "CrimsonPro_400Regular",
-    fontSize: 11,
-  },
-  calendarBoard: {
-    gap: 10,
-    marginTop: 18,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "rgba(31,54,92,0.06)",
-    borderRadius: 20,
-    backgroundColor: "rgba(31,54,92,0.025)",
-  },
-  calendarRow: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  primaryButton: {
-    marginTop: 24,
-    overflow: "hidden",
-    borderRadius: 18,
-    shadowColor: COLORS.gold,
-    shadowOffset: { width: 0, height: 7 },
-    shadowOpacity: 0.34,
-    shadowRadius: 12,
-    elevation: 5,
-  },
-  primaryGradient: {
-    minHeight: 60,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-    paddingHorizontal: 20,
-  },
-  primaryText: {
-    color: COLORS.night,
-    fontFamily: "CrimsonPro_700Bold",
-    fontSize: 19,
-  },
-  buttonPressed: {
-    opacity: 0.84,
-    transform: [{ scale: 0.99 }],
-  },
-  footer: {
-    marginTop: 28,
-    textAlign: "center",
-    color: "rgba(15,32,64,0.40)",
-    fontFamily: "CrimsonPro_400Regular",
-    fontSize: 12,
-  },
+  safeArea: { flex: 1, backgroundColor: "#213B69" },
+  loading: { flex: 1, backgroundColor: "#DFF1F3" },
+  scroll: { flex: 1, backgroundColor: colors.cream },
+  scrollContent: { alignItems: "center" },
+  header: { width: "100%", minHeight: 210, paddingHorizontal: 20, paddingTop: 18, paddingBottom: 30, overflow: "hidden" },
+  headerBlob: { position: "absolute", borderRadius: 999, backgroundColor: "rgba(255,255,255,0.10)" },
+  headerBlobLeft: { width: 150, height: 150, left: -70, bottom: -85 },
+  headerBlobRight: { width: 120, height: 120, right: -42, top: -48 },
+  star: { position: "absolute", borderRadius: 4, backgroundColor: colors.white, opacity: 0.7 },
+  brandRow: { flexDirection: "row", alignItems: "center", alignSelf: "center" },
+  brandMark: { width: 48, height: 48, marginRight: 11, alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: "rgba(255,247,230,0.78)", borderRadius: 24, backgroundColor: "rgba(244,201,93,0.22)" },
+  brandStar: { color: "#FFF2A8", fontSize: 27 },
+  brandTitle: { color: colors.white, fontFamily: fonts.headingBold, fontSize: 25, lineHeight: 28 },
+  brandSubtitle: { maxWidth: 240, color: "#FFF2B5", fontFamily: fonts.bodySemiBold, fontSize: 10, lineHeight: 13 },
+  progressRow: { marginTop: 27, flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 14, borderRadius: 20, backgroundColor: "rgba(16,26,58,0.20)" },
+  progressLabel: { color: "rgba(255,255,255,0.78)", fontFamily: fonts.bodySemiBold, fontSize: 11 },
+  progressValue: { marginTop: 1, color: colors.white, fontFamily: fonts.headingBold, fontSize: 27, lineHeight: 30 },
+  progressStars: { flexDirection: "row", gap: 4 },
+  progressStar: { color: "rgba(255,255,255,0.28)", fontSize: 12 },
+  progressStarLit: { color: colors.gold },
+  destination: { width: "100%", height: 250, alignItems: "center", justifyContent: "flex-end" },
+  destinationImage: { opacity: 1 },
+  destinationCopy: { width: "100%", alignItems: "center", paddingHorizontal: 18, paddingBottom: 20 },
+  destinationPill: { paddingHorizontal: 13, paddingVertical: 5, borderRadius: radius.pill, backgroundColor: "rgba(255,247,230,0.92)" },
+  destinationEyebrow: { color: colors.navy, fontFamily: fonts.bodyBold, fontSize: 10 },
+  destinationTitle: { maxWidth: 520, marginTop: 7, color: colors.white, fontFamily: fonts.headingBold, fontSize: 22, lineHeight: 25, textAlign: "center", textShadowColor: "rgba(16,26,58,0.45)", textShadowRadius: 5 },
+  intro: { width: "100%", maxWidth: 720, paddingHorizontal: 20, paddingTop: 27, paddingBottom: 26, backgroundColor: "#FFF9EC" },
+  eyebrow: { color: "#65966D", fontFamily: fonts.bodyBold, fontSize: 12 },
+  heading: { marginTop: 4, color: colors.navy, fontFamily: fonts.headingBold, fontSize: 33, lineHeight: 37 },
+  description: { maxWidth: 590, marginTop: 7, color: "#5D6B76", fontFamily: fonts.body, fontSize: 16, lineHeight: 23 },
+  currentCard: { marginTop: 20, minHeight: 92, padding: 13, flexDirection: "row", alignItems: "center", borderRadius: 24, borderWidth: 2, borderColor: "rgba(244,201,93,0.72)", backgroundColor: "#FFFDF6" },
+  currentSymbol: { width: 62, height: 62, alignItems: "center", justifyContent: "center", borderRadius: 21, backgroundColor: "#FFE28A", transform: [{ rotate: "-3deg" }] },
+  currentSymbolText: { fontSize: 29, transform: [{ rotate: "3deg" }] },
+  currentCopy: { flex: 1, paddingHorizontal: 12 },
+  currentLabel: { color: "#65966D", fontFamily: fonts.bodyBold, fontSize: 11 },
+  currentTitle: { marginTop: 2, color: colors.ink, fontFamily: fonts.headingBold, fontSize: 18, lineHeight: 21 },
+  continueButton: { width: 48, height: 48, alignItems: "center", justifyContent: "center", borderRadius: 18, backgroundColor: colors.gold },
+  trailShell: { width: "100%", maxWidth: 720, alignItems: "center", overflow: "hidden", borderTopWidth: 1, borderTopColor: "rgba(105,124,97,0.16)" },
+  trailEnd: { width: "100%", alignItems: "center", marginTop: -54, paddingTop: 38, paddingBottom: 38, backgroundColor: "#C8DABB" },
+  trailEndStar: { color: colors.goldDeep, fontSize: 38 },
+  trailEndTitle: { color: colors.navy, fontFamily: fonts.headingBold, fontSize: 23 },
+  trailEndText: { marginTop: 2, color: colors.muted, fontFamily: fonts.body, fontSize: 14 },
+  pressed: { opacity: 0.72, transform: [{ scale: 0.97 }] },
 });

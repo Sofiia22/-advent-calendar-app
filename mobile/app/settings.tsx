@@ -22,6 +22,9 @@ import {
 } from "../services/notifications";
 import { useAdvent } from "../state/AdventContext";
 import { getTranslations } from "../i18n/translations";
+import { BottomNavigation } from "../components/navigation/BottomNavigation";
+import { useAppFonts } from "../theme/useAppFonts";
+import { fonts } from "../theme/tokens";
 
 const ENABLED_KEY = "@advent/reminder-enabled";
 const IDENTIFIER_KEY = "@advent/reminder-identifier";
@@ -45,6 +48,7 @@ export default function SettingsScreen() {
   );
   const [reminderTime, setReminderTime] = useState(DEFAULT_TIME);
   const [isLoading, setIsLoading] = useState(true);
+  const [fontsLoaded] = useAppFonts();
 
   useEffect(() => {
     async function loadSettings() {
@@ -66,6 +70,10 @@ export default function SettingsScreen() {
     void loadSettings();
   }, []);
 
+  if (!fontsLoaded) {
+    return <View style={styles.safeArea} />;
+  }
+
   const toggleReminder = async (enabled: boolean) => {
     if (!enabled) {
       if (reminderIdentifier) {
@@ -86,6 +94,7 @@ export default function SettingsScreen() {
     const identifier = await scheduleDailyReminder(
       reminderTime.getHours(),
       reminderTime.getMinutes(),
+      { title: t.reminderNotificationTitle, body: t.reminderNotificationBody },
     );
 
     if (!identifier) {
@@ -125,6 +134,7 @@ export default function SettingsScreen() {
     const newIdentifier = await scheduleDailyReminder(
       selectedTime.getHours(),
       selectedTime.getMinutes(),
+      { title: t.reminderNotificationTitle, body: t.reminderNotificationBody },
     );
 
     if (newIdentifier) {
@@ -134,7 +144,10 @@ export default function SettingsScreen() {
   };
 
   const sendTestNotification = async () => {
-    const scheduled = await scheduleTestNotification();
+    const scheduled = await scheduleTestNotification({
+      title: t.testNotificationTitle,
+      body: t.testNotificationBody,
+    });
 
     if (!scheduled) {
       Alert.alert(t.notificationsDisabled, t.notificationsDisabledMessage);
@@ -164,7 +177,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={["top"]}>
       <StatusBar style="dark" />
 
       <View style={styles.header}>
@@ -268,6 +281,7 @@ export default function SettingsScreen() {
           <Text style={styles.resetButtonText}>{t.resetJourney}</Text>
         </Pressable>
       </ScrollView>
+      <BottomNavigation />
     </SafeAreaView>
   );
 }
@@ -296,7 +310,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: "#0F2040",
-    fontFamily: "CrimsonPro_700Bold",
+    fontFamily: fonts.headingBold,
     fontSize: 28,
   },
   placeholder: {
@@ -309,7 +323,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     marginBottom: 12,
     color: "#6F7843",
-    fontFamily: "CrimsonPro_600SemiBold",
+    fontFamily: fonts.bodyBold,
     fontSize: 14,
     letterSpacing: 2,
   },
@@ -339,13 +353,13 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     color: "#0F2040",
-    fontFamily: "CrimsonPro_600SemiBold",
+    fontFamily: fonts.heading,
     fontSize: 20,
   },
   cardSubtitle: {
     marginTop: 3,
     color: "#817D75",
-    fontFamily: "CrimsonPro_400Regular",
+    fontFamily: fonts.body,
     fontSize: 15,
     lineHeight: 20,
   },
@@ -357,7 +371,7 @@ const styles = StyleSheet.create({
   },
   timeLabel: {
     color: "#6F7843",
-    fontFamily: "CrimsonPro_600SemiBold",
+    fontFamily: fonts.bodyBold,
     fontSize: 13,
     letterSpacing: 1.5,
   },
@@ -373,7 +387,7 @@ const styles = StyleSheet.create({
   },
   testButtonText: {
     color: "#FFFFFF",
-    fontFamily: "CrimsonPro_600SemiBold",
+    fontFamily: fonts.bodyBold,
     fontSize: 18,
   },
   preferencesTitle: {
@@ -403,7 +417,7 @@ const styles = StyleSheet.create({
   },
   resetButtonText: {
     color: "#A4473E",
-    fontFamily: "CrimsonPro_600SemiBold",
+    fontFamily: fonts.bodyBold,
     fontSize: 18,
   },
 });
