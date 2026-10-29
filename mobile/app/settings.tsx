@@ -6,6 +6,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import {
   Alert,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -25,6 +26,9 @@ import { getTranslations } from "../i18n/translations";
 import { BottomNavigation } from "../components/navigation/BottomNavigation";
 import { useAppFonts } from "../theme/useAppFonts";
 import { fonts } from "../theme/tokens";
+import { LEGAL_CONTENT } from '../data/legal';
+import { REVIEW_TEXT } from '../config/review';
+import { PwaInstallGuide } from '../components/PwaInstallGuide';
 
 const ENABLED_KEY = "@advent/reminder-enabled";
 const IDENTIFIER_KEY = "@advent/reminder-identifier";
@@ -40,7 +44,7 @@ const LANGUAGE_NAMES = {
 };
 
 export default function SettingsScreen() {
-  const { selectedLanguage, resetProgress } = useAdvent();
+  const { selectedLanguage, resetProgress, isPreview, setPreview, reviewAuthorized } = useAdvent();
   const t = getTranslations(selectedLanguage);
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [reminderIdentifier, setReminderIdentifier] = useState<string | null>(
@@ -196,7 +200,7 @@ export default function SettingsScreen() {
       >
         <Text style={styles.sectionTitle}>{t.dailyJourney}</Text>
 
-        <View style={styles.card}>
+        {Platform.OS !== 'web' && <><View style={styles.card}>
           <View style={styles.settingRow}>
             <View style={styles.icon}>
               <Ionicons
@@ -252,6 +256,7 @@ export default function SettingsScreen() {
             {t.sendTestNotification}
           </Text>
         </Pressable>
+        </>}
 
         <Text style={[styles.sectionTitle, styles.preferencesTitle]}>
           {t.preferences}
@@ -275,6 +280,15 @@ export default function SettingsScreen() {
           <Ionicons name="chevron-forward" size={22} color="#817D75" />
         </Pressable>
 
+        <Pressable accessibilityRole="button" onPress={() => router.push('/privacy')} style={styles.resetButton}><Text>{LEGAL_CONTENT[selectedLanguage].privacyTitle}</Text></Pressable>
+        <PwaInstallGuide />
+        {reviewAuthorized && <Pressable accessibilityRole="button" onPress={() => { setPreview(!isPreview); router.replace('/home'); }} style={[styles.languageCard, { marginTop: 18 }]}>
+          <View style={styles.textContainer}>
+            <Text style={styles.cardTitle}>{isPreview ? REVIEW_TEXT[selectedLanguage].exit : REVIEW_TEXT[selectedLanguage].title}</Text>
+            <Text style={styles.cardSubtitle}>{REVIEW_TEXT[selectedLanguage].description}</Text>
+          </View>
+        </Pressable>}
+        <Pressable accessibilityRole="button" onPress={() => router.push('/support')} style={styles.resetButton}><Text>{LEGAL_CONTENT[selectedLanguage].supportTitle}</Text></Pressable>
         <Pressable onPress={confirmResetProgress} style={styles.resetButton}>
           <Ionicons name="refresh-outline" size={20} color="#A4473E" />
 

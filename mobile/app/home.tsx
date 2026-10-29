@@ -1,17 +1,17 @@
-import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { Alert, ImageBackground, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { Alert, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { PromiseTrail, MilestoneState } from "../components/journey/PromiseTrail";
+import { MilestoneState } from "../components/journey/PromiseTrail";
+import { FairytaleMap } from "../components/journey/FairytaleMap";
 import { BottomNavigation } from "../components/navigation/BottomNavigation";
-import { getAdventDay } from "../data/adventDays";
 import { getTranslations } from "../i18n/translations";
 import { useAdvent } from "../state/AdventContext";
 import { colors, fonts, radius } from "../theme/tokens";
 import { useAppFonts } from "../theme/useAppFonts";
+import { TESTING_UNLOCK } from '../config/testing';
 
 const STARS = [
   ["8%", 24, 2], ["17%", 72, 3], ["31%", 34, 2], ["45%", 91, 2],
@@ -20,11 +20,11 @@ const STARS = [
 
 export default function HomeScreen() {
   const { width } = useWindowDimensions();
-  const { completedDays, currentDay, isHydrated, selectedLanguage } = useAdvent();
+  const { completedDays, currentDay, availableDay, isPreview, isHydrated, selectedLanguage } = useAdvent();
   const [fontsLoaded] = useAppFonts();
   const t = getTranslations(selectedLanguage);
-  const trailWidth = Math.min(width, 720);
-  const current = getAdventDay(currentDay);
+  const trailWidth = Math.min(width, 1536);
+
 
   if (!fontsLoaded || !isHydrated) return <View style={styles.loading} />;
 
@@ -38,9 +38,10 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView edges={["top"]} style={styles.safeArea}>
+      {TESTING_UNLOCK && <Text style={{ backgroundColor: '#6A1717', color: '#fff', padding: 8, textAlign: 'center' }}>TEST BUILD · ALL DAYS UNLOCKED · NOT FOR PRODUCTION</Text>}
       <StatusBar style="light" />
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <LinearGradient colors={["#213B69", "#426F9B", "#74B9D1"]} style={styles.header}>
+        <LinearGradient colors={["#213B69", "#426F9B", "#74B9D1"]} style={[styles.header, {minHeight: 150, paddingBottom: 16}]}>
           <View style={[styles.headerBlob, styles.headerBlobLeft]} />
           <View style={[styles.headerBlob, styles.headerBlobRight]} />
           {STARS.map(([left, top, size], index) => (
@@ -64,36 +65,12 @@ export default function HomeScreen() {
               ))}
             </View>
           </View>
+          {availableDay===0&&!isPreview&&<Text style={{color:'#fff4d9',fontSize:17,marginTop:16}}>{selectedLanguage==='uk'?'Ласкаво просимо! Подорож почнеться 1 грудня 2026 року.':selectedLanguage==='ru'?'Добро пожаловать! Путешествие начнётся 1 декабря 2026 года.':'Welcome! Your journey begins December 1, 2026.'}</Text>}
         </LinearGradient>
 
-        <ImageBackground source={require("../assets/images/promise-trail-hero-v2.png")} style={styles.destination} imageStyle={styles.destinationImage}>
-          <LinearGradient colors={["rgba(16,26,58,0.02)", "rgba(16,26,58,0.08)", "rgba(16,26,58,0.58)"]} locations={[0, 0.55, 1]} style={StyleSheet.absoluteFill} />
-          <View style={styles.destinationCopy}>
-            <View style={styles.destinationPill}>
-              <Text style={styles.destinationEyebrow}>{t.destination}</Text>
-            </View>
-            <Text style={styles.destinationTitle}>{completedDays.length === 24 ? t.promisedSavior : t.destinationHidden}</Text>
-          </View>
-        </ImageBackground>
-
-        <View style={styles.intro}>
-          <Text style={styles.eyebrow}>{t.promiseTrail}</Text>
-          <Text style={styles.heading}>{t.followThePromise}</Text>
-          <Text style={styles.description}>{t.trailDescription}</Text>
-          <View style={styles.currentCard}>
-            <View style={styles.currentSymbol}><Text style={styles.currentSymbolText}>{current?.symbol}</Text></View>
-            <View style={styles.currentCopy}>
-              <Text style={styles.currentLabel}>{t.currentStop}</Text>
-              <Text style={styles.currentTitle}>{current?.title[selectedLanguage]}</Text>
-            </View>
-            <Pressable onPress={() => openDay(currentDay, "current")} accessibilityRole="button" accessibilityLabel={t.openTodaysStory} style={({ pressed }) => [styles.continueButton, pressed && styles.pressed]}>
-              <Ionicons name="arrow-forward" size={21} color={colors.navy} />
-            </Pressable>
-          </View>
-        </View>
 
         <View style={styles.trailShell}>
-          <PromiseTrail
+          <FairytaleMap
             width={trailWidth}
             currentDay={currentDay}
             completedDays={completedDays}
@@ -128,7 +105,7 @@ const styles = StyleSheet.create({
   brandStar: { color: "#FFF2A8", fontSize: 27 },
   brandTitle: { color: colors.white, fontFamily: fonts.headingBold, fontSize: 25, lineHeight: 28 },
   brandSubtitle: { maxWidth: 240, color: "#FFF2B5", fontFamily: fonts.bodySemiBold, fontSize: 10, lineHeight: 13 },
-  progressRow: { marginTop: 27, flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 14, borderRadius: 20, backgroundColor: "rgba(16,26,58,0.20)" },
+  progressRow: { marginTop: 16, flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 14, borderRadius: 20, backgroundColor: "rgba(16,26,58,0.20)" },
   progressLabel: { color: "rgba(255,255,255,0.78)", fontFamily: fonts.bodySemiBold, fontSize: 11 },
   progressValue: { marginTop: 1, color: colors.white, fontFamily: fonts.headingBold, fontSize: 27, lineHeight: 30 },
   progressStars: { flexDirection: "row", gap: 4 },
@@ -151,10 +128,10 @@ const styles = StyleSheet.create({
   currentLabel: { color: "#65966D", fontFamily: fonts.bodyBold, fontSize: 11 },
   currentTitle: { marginTop: 2, color: colors.ink, fontFamily: fonts.headingBold, fontSize: 18, lineHeight: 21 },
   continueButton: { width: 48, height: 48, alignItems: "center", justifyContent: "center", borderRadius: 18, backgroundColor: colors.gold },
-  trailShell: { width: "100%", maxWidth: 720, alignItems: "center", overflow: "hidden", borderTopWidth: 1, borderTopColor: "rgba(105,124,97,0.16)" },
-  trailEnd: { width: "100%", alignItems: "center", marginTop: -54, paddingTop: 38, paddingBottom: 38, backgroundColor: "#C8DABB" },
+  trailShell: { width: "100%", maxWidth: 1536, alignItems: "center", overflow: "hidden", borderTopWidth: 1, borderTopColor: "rgba(105,124,97,0.16)" },
+  trailEnd: { width: "100%", alignItems: "center", marginTop: 0, paddingTop: 24, paddingBottom: 38, backgroundColor: "#142443" },
   trailEndStar: { color: colors.goldDeep, fontSize: 38 },
-  trailEndTitle: { color: colors.navy, fontFamily: fonts.headingBold, fontSize: 23 },
-  trailEndText: { marginTop: 2, color: colors.muted, fontFamily: fonts.body, fontSize: 14 },
+  trailEndTitle: { color: "#ffe5a0", fontFamily: fonts.headingBold, fontSize: 23 },
+  trailEndText: { marginTop: 2, color: "#c4d4ec", fontFamily: fonts.body, fontSize: 14 },
   pressed: { opacity: 0.72, transform: [{ scale: 0.97 }] },
 });

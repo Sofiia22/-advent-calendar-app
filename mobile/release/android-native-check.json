@@ -1,0 +1,320 @@
+{
+  "checkedAt": "2026-10-29T18:49:40.644Z",
+  "artifact": "AdventBibleJourney-1.0.0-unsigned.aab",
+  "bytes": 161739423,
+  "sha256": "95666756b4117052082e8f125864970e2bd349e92c46c0c50b7c961a4ca9177a",
+  "checkedLibraries": 44,
+  "failures": 0,
+  "records": [
+    {
+      "entry": "base/lib/arm64-v8a/libanimation-decoder-gif.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/arm64-v8a/libappmodules.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/arm64-v8a/libavif_android.so",
+      "loadAligned": true,
+      "relroEndAligned": true,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/arm64-v8a/libc++_shared.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/arm64-v8a/libexpo-modules-core.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/arm64-v8a/libfbjni.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/arm64-v8a/libgesturehandler.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/arm64-v8a/libgifimage.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/arm64-v8a/libhermes.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/arm64-v8a/libhermestooling.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/arm64-v8a/libimagepipeline.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/arm64-v8a/libjsi.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/arm64-v8a/libnative-filters.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/arm64-v8a/libnative-imagetranscoder.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/arm64-v8a/libreact_codegen_rnscreens.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/arm64-v8a/libreact_codegen_rnsvg.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/arm64-v8a/libreact_codegen_safeareacontext.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/arm64-v8a/libreactnative.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/arm64-v8a/libreanimated.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/arm64-v8a/librnscreens.so",
+      "loadAligned": true,
+      "relroEndAligned": true,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/arm64-v8a/libstatic-webp.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/arm64-v8a/libworklets.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/x86_64/libanimation-decoder-gif.so",
+      "loadAligned": true,
+      "relroEndAligned": true,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/x86_64/libappmodules.so",
+      "loadAligned": true,
+      "relroEndAligned": true,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/x86_64/libavif_android.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/x86_64/libc++_shared.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/x86_64/libexpo-modules-core.so",
+      "loadAligned": true,
+      "relroEndAligned": true,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/x86_64/libfbjni.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/x86_64/libgesturehandler.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/x86_64/libgifimage.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/x86_64/libhermes.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/x86_64/libhermestooling.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/x86_64/libimagepipeline.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/x86_64/libjsi.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/x86_64/libnative-filters.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/x86_64/libnative-imagetranscoder.so",
+      "loadAligned": true,
+      "relroEndAligned": true,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/x86_64/libreact_codegen_rnscreens.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/x86_64/libreact_codegen_rnsvg.so",
+      "loadAligned": true,
+      "relroEndAligned": true,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/x86_64/libreact_codegen_safeareacontext.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/x86_64/libreactnative.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/x86_64/libreanimated.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/x86_64/librnscreens.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/x86_64/libstatic-webp.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    },
+    {
+      "entry": "base/lib/x86_64/libworklets.so",
+      "loadAligned": true,
+      "relroEndAligned": false,
+      "relroOwnLoad": true,
+      "pass": true
+    }
+  ],
+  "reference": "https://developer.android.com/guide/practices/page-sizes",
+  "limitations": "Static ELF checks only. Not APK ZIP alignment, Play validation or execution on a 16 KB device."
+}

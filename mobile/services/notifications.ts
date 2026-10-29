@@ -11,6 +11,7 @@ Notifications.setNotificationHandler({
 });
 
 export async function prepareNotifications() {
+  if (Platform.OS === 'web') return false;
   if (Platform.OS === "android") {
     await Notifications.setNotificationChannelAsync("daily-reminders", {
       name: "Daily Advent reminders",
@@ -34,7 +35,7 @@ export async function scheduleDailyReminder(
   minute: number,
   copy: { title: string; body: string },
 ) {
-  const hasPermission = await prepareNotifications();
+  const hasPermission = await prepareNotifications().catch(() => false);
 
   if (!hasPermission) {
     return null;
@@ -51,16 +52,16 @@ export async function scheduleDailyReminder(
       hour,
       minute,
     },
-  });
+  }).catch(() => null);
 }
 export async function scheduleTestNotification(copy: { title: string; body: string }) {
-  const hasPermission = await prepareNotifications();
+  const hasPermission = await prepareNotifications().catch(() => false);
 
   if (!hasPermission) {
     return false;
   }
 
-  await Notifications.scheduleNotificationAsync({
+  const identifier = await Notifications.scheduleNotificationAsync({
     content: {
       title: copy.title,
       body: copy.body,
@@ -70,10 +71,10 @@ export async function scheduleTestNotification(copy: { title: string; body: stri
       type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
       seconds: 5,
     },
-  });
+  }).catch(() => null);
 
-  return true;
+  return identifier !== null;
 }
 export async function cancelReminder(identifier: string) {
-  await Notifications.cancelScheduledNotificationAsync(identifier);
+  if (Platform.OS !== 'web') await Notifications.cancelScheduledNotificationAsync(identifier).catch(() => {});
 }

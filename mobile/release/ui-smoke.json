@@ -1,0 +1,362 @@
+[
+  {
+    "day": 1,
+    "language": "Українська",
+    "pass": true
+  },
+  {
+    "day": 1,
+    "language": "English",
+    "pass": true
+  },
+  {
+    "day": 1,
+    "language": "Русский",
+    "pass": true
+  },
+  {
+    "day": 2,
+    "language": "Українська",
+    "pass": true
+  },
+  {
+    "day": 2,
+    "language": "English",
+    "pass": true
+  },
+  {
+    "day": 2,
+    "language": "Русский",
+    "pass": true
+  },
+  {
+    "day": 3,
+    "language": "Українська",
+    "pass": true
+  },
+  {
+    "day": 3,
+    "language": "English",
+    "pass": true
+  },
+  {
+    "day": 3,
+    "language": "Русский",
+    "pass": true
+  },
+  {
+    "day": 4,
+    "language": "Українська",
+    "pass": true
+  },
+  {
+    "day": 4,
+    "language": "English",
+    "pass": true
+  },
+  {
+    "day": 4,
+    "language": "Русский",
+    "pass": true
+  },
+  {
+    "day": 5,
+    "language": "Українська",
+    "pass": true
+  },
+  {
+    "day": 5,
+    "language": "English",
+    "pass": true
+  },
+  {
+    "day": 5,
+    "language": "Русский",
+    "pass": true
+  },
+  {
+    "day": 6,
+    "language": "Українська",
+    "pass": true
+  },
+  {
+    "day": 6,
+    "language": "English",
+    "pass": true
+  },
+  {
+    "day": 6,
+    "language": "Русский",
+    "pass": true
+  },
+  {
+    "day": 7,
+    "language": "Українська",
+    "pass": true
+  },
+  {
+    "day": 7,
+    "language": "English",
+    "pass": true
+  },
+  {
+    "day": 7,
+    "language": "Русский",
+    "pass": true
+  },
+  {
+    "day": 8,
+    "language": "Українська",
+    "pass": true
+  },
+  {
+    "day": 8,
+    "language": "English",
+    "pass": true
+  },
+  {
+    "day": 8,
+    "language": "Русский",
+    "pass": true
+  },
+  {
+    "day": 9,
+    "language": "Українська",
+    "pass": true
+  },
+  {
+    "day": 9,
+    "language": "English",
+    "pass": true
+  },
+  {
+    "day": 9,
+    "language": "Русский",
+    "pass": true
+  },
+  {
+    "day": 10,
+    "language": "Українська",
+    "pass": true
+  },
+  {
+    "day": 10,
+    "language": "English",
+    "pass": true
+  },
+  {
+    "day": 10,
+    "language": "Русский",
+    "pass": true
+  },
+  {
+    "day": 11,
+    "language": "Українська",
+    "pass": true
+  },
+  {
+    "day": 11,
+    "language": "English",
+    "pass": true
+  },
+  {
+    "day": 11,
+    "language": "Русский",
+    "pass": true
+  },
+  {
+    "day": 12,
+    "language": "Українська",
+    "pass": true
+  },
+  {
+    "day": 12,
+    "language": "English",
+    "pass": true
+  },
+  {
+    "day": 12,
+    "language": "Русский",
+    "pass": true
+  },
+  {
+    "day": 13,
+    "language": "Українська",
+    "pass": true
+  },
+  {
+    "day": 13,
+    "language": "English",
+    "pass": true
+  },
+  {
+    "day": 13,
+    "language": "Русский",
+    "pass": true
+  },
+  {
+    "day": 14,
+    "language": "Українська",
+    "pass": true
+  },
+  {
+    "day": 14,
+    "language": "English",
+    "pass": true
+  },
+  {
+    "day": 14,
+    "language": "Русский",
+    "pass": true
+  },
+  {
+    "day": 15,
+    "language": "Українська",
+    "pass": true
+  },
+  {
+    "day": 15,
+    "language": "English",
+    "pass": true
+  },
+  {
+    "day": 15,
+    "language": "Русский",
+    "pass": true
+  },
+  {
+    "day": 16,
+    "language": "Українська",
+    "pass": true
+  },
+  {
+    "day": 16,
+    "language": "English",
+    "pass": true
+  },
+  {
+    "day": 16,
+    "language": "Русский",
+    "pass": true
+  },
+  {
+    "day": 17,
+    "language": "Українська",
+    "pass": true
+  },
+  {
+    "day": 17,
+    "language": "English",
+    "pass": true
+  },
+  {
+    "day": 17,
+    "language": "Русский",
+    "pass": true
+  },
+  {
+    "day": 18,
+    "language": "Українська",
+    "pass": true
+  },
+  {
+    "day": 18,
+    "language": "English",
+    "pass": true
+  },
+  {
+    "day": 18,
+    "language": "Русский",
+    "pass": true
+  },
+  {
+    "day": 19,
+    "language": "Українська",
+    "pass": true
+  },
+  {
+    "day": 19,
+    "language": "English",
+    "pass": true
+  },
+  {
+    "day": 19,
+    "language": "Русский",
+    "pass": true
+  },
+  {
+    "day": 20,
+    "language": "Українська",
+    "pass": true
+  },
+  {
+    "day": 20,
+    "language": "English",
+    "pass": true
+  },
+  {
+    "day": 20,
+    "language": "Русский",
+    "pass": true
+  },
+  {
+    "day": 21,
+    "language": "Українська",
+    "pass": true
+  },
+  {
+    "day": 21,
+    "language": "English",
+    "pass": true
+  },
+  {
+    "day": 21,
+    "language": "Русский",
+    "pass": true
+  },
+  {
+    "day": 22,
+    "language": "Українська",
+    "pass": true
+  },
+  {
+    "day": 22,
+    "language": "English",
+    "pass": true
+  },
+  {
+    "day": 22,
+    "language": "Русский",
+    "pass": true
+  },
+  {
+    "day": 23,
+    "language": "Українська",
+    "pass": true
+  },
+  {
+    "day": 23,
+    "language": "English",
+    "pass": true
+  },
+  {
+    "day": 23,
+    "language": "Русский",
+    "pass": true
+  },
+  {
+    "day": 24,
+    "language": "Українська",
+    "pass": true
+  },
+  {
+    "day": 24,
+    "language": "English",
+    "pass": true
+  },
+  {
+    "day": 24,
+    "language": "Русский",
+    "pass": true
+  }
+]

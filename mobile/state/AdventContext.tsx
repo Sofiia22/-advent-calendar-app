@@ -7,7 +7,12 @@ import {
   useEffect,
   useMemo,
   useState,
+  useRef,
 } from "react";
+import { Alert, AppState } from 'react-native';
+import { TESTING_UNLOCK } from '../config/testing';
+import { useReviewerAccess } from '../web/reviewerAccess';
+import { addCompletedDay, canOpenDay, parseCompletedDays, unlockedDay } from './progress';
 
 export type LanguageId = "en" | "uk" | "ru";
 
@@ -15,8 +20,13 @@ type AdventContextValue = {
   selectedLanguage: LanguageId;
   completedDays: number[];
   currentDay: number;
+  availableDay: number;
+  canOpenDay: (day: number) => boolean;
   isHydrated: boolean;
   isOnboarded: boolean;
+  isPreview: boolean;
+  reviewAuthorized: boolean;
+  setPreview: (enabled: boolean) => void;
   setLanguage: (language: LanguageId) => Promise<void>;
   finishOnboarding: () => Promise<void>;
   completeDay: (day: number) => Promise<void>;
@@ -52,33 +62,6 @@ function isLanguage(value: string | null): value is LanguageId {
   return value === "en" || value === "uk" || value === "ru";
 }
 
-function parseCompletedDays(value: string | null): number[] {
-  if (!value) {
-    return DEFAULT_COMPLETED_DAYS;
-  }
-
-  try {
-    const parsed: unknown = JSON.parse(value);
-
-    if (!Array.isArray(parsed)) {
-      return DEFAULT_COMPLETED_DAYS;
-    }
-
-    return parsed
-      .filter(
-        (day): day is number =>
-          typeof day === "number" &&
-          Number.isInteger(day) &&
-          day >= 1 &&
-          day <= 24,
-      )
-      .filter((day, index, days) => days.indexOf(day) === index)
-      .sort((a, b) => a - b);
-  } catch {
-    return DEFAULT_COMPLETED_DAYS;
-  }
-}
-
 export function AdventProvider({ children }: AdventProviderProps) {
   const [selectedLanguage, setSelectedLanguage] =
     useState<LanguageId>(DEFAULT_LANGUAGE);
@@ -89,6 +72,20 @@ export function AdventProvider({ children }: AdventProviderProps) {
 
   const [isHydrated, setIsHydrated] = useState(false);
   const [isOnboarded, setIsOnboarded] = useState(false);
+  // Review/demo access is explicit and session-only; never changes saved progress.
+  const [previewRequested, setPreview] = useState(false);
+  const reviewAuthorized = useReviewerAccess();
+  const isPreview = previewRequested && reviewAuthorized;
+  const [availableDay, setAvailableDay] = useState(() => TESTING_UNLOCK ? 24 : unlockedDay());
+  const completedRef = useRef<number[]>([]);
+  const storageLoaded = useRef(false);
+  const writeQueue = useRef(Promise.resolve());
+  useEffect(() => {
+    const refresh = () => setAvailableDay(TESTING_UNLOCK ? 24 : unlockedDay());
+    const subscription = AppState.addEventListener('change', state => { if (state === 'active') refresh(); });
+    const timer = setInterval(refresh, 60000);
+    return () => { subscription.remove(); clearInterval(timer); };
+  }, []);
 
   useEffect(() => {
     const loadStoredState = async () => {
@@ -107,8 +104,10 @@ export function AdventProvider({ children }: AdventProviderProps) {
           setSelectedLanguage(storedLanguage);
         }
 
-        setCompletedDays(parseCompletedDays(storedCompletedDays));
+        completedRef.current = parseCompletedDays(storedCompletedDays);
+        setCompletedDays(completedRef.current);
         setIsOnboarded(storedOnboarded === "true");
+        storageLoaded.current = true;
       } catch (error) {
         console.warn("Could not load Advent progress:", error);
       } finally {
@@ -138,46 +137,58 @@ export function AdventProvider({ children }: AdventProviderProps) {
     }
   }, []);
 
-  const completeDay = useCallback(async (day: number) => {
-    const firstIncomplete = Array.from({ length: 24 }, (_, index) => index + 1)
-      .find((candidate) => !completedDays.includes(candidate)) ?? 24;
-    const nextCompletedDays = day > firstIncomplete || completedDays.includes(day)
-      ? completedDays
-      : [...completedDays, day].sort((a, b) => a - b);
-
-    setCompletedDays(nextCompletedDays);
-
-    try {
-      await AsyncStorage.setItem(COMPLETED_DAYS_KEY, JSON.stringify(nextCompletedDays));
-    } catch (error) {
-      console.warn("Could not save Advent progress:", error);
-    }
-  }, [completedDays]);
+  const completeDay = useCallback((day: number) => {
+    if (isPreview) return Promise.resolve();
+    writeQueue.current = writeQueue.current.then(async () => {
+      if (!storageLoaded.current) {
+        Alert.alert(selectedLanguage === 'uk' ? 'Сховище недоступне. Перезапустіть застосунок перед збереженням прогресу.' : selectedLanguage === 'ru' ? 'Хранилище недоступно. Перезапустите приложение перед сохранением прогресса.' : 'Storage is unavailable. Restart the app before saving progress.');
+        return;
+      }
+      const next = addCompletedDay(completedRef.current, day, TESTING_UNLOCK ? 24 : unlockedDay());
+      try {
+        await AsyncStorage.setItem(COMPLETED_DAYS_KEY, JSON.stringify(next));
+        completedRef.current = next;
+        setCompletedDays(next);
+      } catch {
+        const message = selectedLanguage === 'uk' ? 'Не вдалося зберегти прогрес. Спробуйте ще раз.' : selectedLanguage === 'ru' ? 'Не удалось сохранить прогресс. Попробуйте ещё раз.' : 'Progress could not be saved. Please try again.';
+        Alert.alert(message);
+      }
+    });
+    return writeQueue.current;
+  }, [selectedLanguage, isPreview]);
   const isDayCompleted = useCallback(
     (day: number) => completedDays.includes(day),
     [completedDays],
   );
 
   const resetProgress = useCallback(async () => {
-    setCompletedDays(DEFAULT_COMPLETED_DAYS);
-
+    await writeQueue.current;
     try {
       await AsyncStorage.removeItem(COMPLETED_DAYS_KEY);
-    } catch (error) {
-      console.warn("Could not reset Advent progress:", error);
+      completedRef.current = [];
+      setCompletedDays([]);
+    } catch {
+      Alert.alert(selectedLanguage === 'uk' ? 'Не вдалося скинути прогрес.' : selectedLanguage === 'ru' ? 'Не удалось сбросить прогресс.' : 'Progress could not be reset.');
     }
-  }, []);
+  }, [selectedLanguage]);
 
-  const currentDay =
+  const firstIncomplete =
     Array.from({ length: 24 }, (_, index) => index + 1).find(
       (day) => !completedDays.includes(day),
     ) ?? 24;
+  const currentDay = firstIncomplete;
+  const canOpen = useCallback((day: number) => canOpenDay(day, completedDays, availableDay, TESTING_UNLOCK || isPreview), [completedDays, availableDay, isPreview]);
 
   const value = useMemo<AdventContextValue>(
     () => ({
       selectedLanguage,
       completedDays,
       currentDay,
+      availableDay: isPreview ? 24 : availableDay,
+      isPreview,
+      reviewAuthorized,
+      setPreview,
+      canOpenDay: canOpen,
       isHydrated,
       isOnboarded,
       setLanguage,
@@ -190,6 +201,10 @@ export function AdventProvider({ children }: AdventProviderProps) {
       selectedLanguage,
       completedDays,
       currentDay,
+      availableDay,
+      isPreview,
+      reviewAuthorized,
+      canOpen,
       isHydrated,
       isOnboarded,
       setLanguage,

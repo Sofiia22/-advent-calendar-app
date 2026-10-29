@@ -3,16 +3,24 @@ import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef, useState } from "react";
-import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Animated, Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { AdventDayMeta } from "../../data/adventDays";
+import { ADVENT_SECTION_ICONS } from "../../data/adventSectionIcons";
 import { getTranslations } from "../../i18n/translations";
 import { useAdvent } from "../../state/AdventContext";
 import { colors, fonts, radius, shadows } from "../../theme/tokens";
 import { useAppFonts } from "../../theme/useAppFonts";
 
-const ICONS = ["book-outline", "library-outline", "bulb-outline", "trail-sign-outline", "chatbubble-ellipses-outline", "people-outline"] as const;
+const SECTION_ICONS = [
+  ADVENT_SECTION_ICONS.scripture,
+  ADVENT_SECTION_ICONS.bibleStory,
+  ADVENT_SECTION_ICONS.questions,
+  ADVENT_SECTION_ICONS.promise,
+  ADVENT_SECTION_ICONS.connection,
+  ADVENT_SECTION_ICONS.familyChallenge,
+] as const;
 
 export function PlaceholderDayScreen({ day }: { day: AdventDayMeta }) {
   const { completeDay, isDayCompleted, isHydrated, selectedLanguage } = useAdvent();
@@ -60,7 +68,7 @@ export function PlaceholderDayScreen({ day }: { day: AdventDayMeta }) {
         {sections.map((heading, index) => (
           <View key={heading} style={styles.card}>
             <View style={styles.cardHeading}>
-              <View style={styles.cardIcon}><Ionicons name={ICONS[index]} size={20} color={colors.navy} /></View>
+              <View style={styles.cardIcon}><Image source={SECTION_ICONS[index]} resizeMode="contain" style={styles.cardIconImage} /></View>
               <Text style={styles.cardTitle}>{heading}</Text>
             </View>
             <Text style={styles.placeholder}>{t.contentPlaceholder}</Text>
@@ -112,6 +120,7 @@ const styles = StyleSheet.create({
   card: { marginTop: 14, padding: 18, borderWidth: 1, borderColor: colors.line, borderRadius: radius.md, backgroundColor: colors.paper, ...shadows.soft },
   cardHeading: { flexDirection: "row", alignItems: "center" },
   cardIcon: { width: 38, height: 38, alignItems: "center", justifyContent: "center", borderRadius: 19, backgroundColor: "rgba(143,211,232,0.28)" },
+  cardIconImage: { width: 34, height: 34 },
   cardTitle: { flex: 1, marginLeft: 11, color: colors.navy, fontFamily: fonts.heading, fontSize: 20 },
   placeholder: { marginTop: 14, color: colors.muted, fontFamily: fonts.body, fontSize: 14, lineHeight: 22, fontStyle: "italic" },
   completeButton: { marginTop: 22, overflow: "hidden", borderRadius: radius.md, ...shadows.glow },

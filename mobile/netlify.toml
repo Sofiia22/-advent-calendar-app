@@ -1,0 +1,30 @@
+[build]
+  command = "npm run build:pwa"
+  publish = "dist"
+[build.environment]
+  NODE_VERSION = "22"
+  EXPO_PUBLIC_RELEASE_CHANNEL = "production"
+  EXPO_PUBLIC_ADVENT_TESTING = "false"
+[functions]
+  directory = "netlify/functions"
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Cache-Control = "public, max-age=0, must-revalidate"
+[[headers]]
+  for = "/_expo/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-store"
+    Service-Worker-Allowed = "/"
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+# Expo emits actual HTML for every route/day; do not rewrite missing assets to index.html.
+# Netlify serves 404.html for unknown URLs; no catch-all can swallow function URLs.
