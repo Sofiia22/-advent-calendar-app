@@ -9,10 +9,10 @@ import {
   useState,
   useRef,
 } from "react";
-import { Alert, AppState } from 'react-native';
+import { Alert, AppState, Platform } from 'react-native';
 import { TESTING_UNLOCK } from '../config/testing';
 import { useReviewerAccess } from '../web/reviewerAccess';
-import { addCompletedDay, canOpenDay, parseCompletedDays, unlockedDay } from './progress';
+import { addCompletedDay, availableDayFor, canOpenDay, parseCompletedDays, unlockedDay } from './progress';
 
 export type LanguageId = "en" | "uk" | "ru";
 
@@ -144,7 +144,7 @@ export function AdventProvider({ children }: AdventProviderProps) {
         Alert.alert(selectedLanguage === 'uk' ? 'Сховище недоступне. Перезапустіть застосунок перед збереженням прогресу.' : selectedLanguage === 'ru' ? 'Хранилище недоступно. Перезапустите приложение перед сохранением прогресса.' : 'Storage is unavailable. Restart the app before saving progress.');
         return;
       }
-      const next = addCompletedDay(completedRef.current, day, TESTING_UNLOCK ? 24 : unlockedDay());
+      const next = addCompletedDay(completedRef.current, day, TESTING_UNLOCK ? 24 : availableDayFor(Platform.OS, completedRef.current));
       try {
         await AsyncStorage.setItem(COMPLETED_DAYS_KEY, JSON.stringify(next));
         completedRef.current = next;
@@ -177,14 +177,15 @@ export function AdventProvider({ children }: AdventProviderProps) {
       (day) => !completedDays.includes(day),
     ) ?? 24;
   const currentDay = firstIncomplete;
-  const canOpen = useCallback((day: number) => canOpenDay(day, completedDays, availableDay, TESTING_UNLOCK || isPreview), [completedDays, availableDay, isPreview]);
+  const effectiveAvailableDay = Platform.OS === 'web' ? availableDayFor('web', completedDays) : availableDay;
+  const canOpen = useCallback((day: number) => canOpenDay(day, completedDays, effectiveAvailableDay, TESTING_UNLOCK || isPreview), [completedDays, effectiveAvailableDay, isPreview]);
 
   const value = useMemo<AdventContextValue>(
     () => ({
       selectedLanguage,
       completedDays,
       currentDay,
-      availableDay: isPreview ? 24 : availableDay,
+      availableDay: isPreview || TESTING_UNLOCK ? 24 : effectiveAvailableDay,
       isPreview,
       reviewAuthorized,
       setPreview,
@@ -201,7 +202,7 @@ export function AdventProvider({ children }: AdventProviderProps) {
       selectedLanguage,
       completedDays,
       currentDay,
-      availableDay,
+      effectiveAvailableDay,
       isPreview,
       reviewAuthorized,
       canOpen,

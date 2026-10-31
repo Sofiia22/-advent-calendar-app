@@ -12,7 +12,7 @@ export const LEGAL_CONTENT = {
       'In the web/PWA version, Netlify serves app files and may process IP addresses and standard request logs for hosting and security. Reading needs no account. Authorized reviewers use a server-verified, temporary HttpOnly cookie; their password is not included in browser code. Offline caches and progress stay on the device and may be cleared by browser storage policies. Local reminders are available in native apps, not this PWA. The PWA privacy policy is also available from Settings → Privacy.',
     ],
     support: [
-      'Choose a numbered stop on the map, then use its arrow to open the story. New days open December 1–24, 2026 in your device’s local time. Completed stories remain available.',
+      'Tap a numbered stop on the map to open its story. On the website, day 1 is available immediately; completing a day unlocks the next. In the iOS and Android apps, new days open December 1–24, 2026 in your device’s local time. Completed stories remain available.',
       'Read Scripture, Bible Story, Questions, Promise, Connection and Family Challenge. Use Complete Day on the last section to save completion. You can change the language in the story header without losing your place.',
       'Stories work offline after installation. YouTube and Maps need an internet connection. If reminders are unavailable, check notification permissions in your device’s settings.',
       'Do not uninstall the app to fix a problem before preserving your progress. When reporting an issue, include your device model, OS version, app version, day number and selected language. Never send a child’s name or private information.',
@@ -32,7 +32,7 @@ export const LEGAL_CONTENT = {
       'У веб/PWA-версії Netlify надає файли застосунку й може обробляти IP-адреси та стандартні журнали запитів для хостингу й безпеки. Для читання акаунт не потрібен. Авторизовані рецензенти використовують тимчасовий HttpOnly-cookie після серверної перевірки; пароля немає в коді браузера. Офлайн-кеш і прогрес залишаються на пристрої, але браузер може видалити їх за своїми правилами. Місцеві нагадування доступні в нативних застосунках, не в PWA. Політика PWA також доступна в Налаштування → Приватність.',
     ],
     support: [
-      'Оберіть номер на карті й натисніть стрілку, щоб відкрити історію. Нові дні відкриваються 1–24 грудня 2026 року за місцевим часом пристрою. Завершені історії залишаються доступними.',
+      'Натисніть номер на карті, щоб відкрити історію. На сайті день 1 доступний одразу; завершення дня відкриває наступний. У застосунках iOS та Android нові дні відкриваються 1–24 грудня 2026 року за місцевим часом пристрою. Завершені історії залишаються доступними.',
       'Прочитайте Писання, Біблійну історію, Запитання, Обітницю, Зв’язок та Сімейне завдання. На останньому розділі натисніть «Завершити день». Мову можна змінити вгорі історії без втрати місця читання.',
       'Після встановлення історії працюють без інтернету. Для YouTube та карти потрібне підключення. Якщо нагадування не працюють, перевірте дозвіл на сповіщення в налаштуваннях пристрою.',
       'Не видаляйте застосунок для виправлення помилки, не зберігши прогрес. Для повідомлення про помилку зазначте модель пристрою, версію системи й застосунку, номер дня та мову. Не надсилайте імен дітей або приватної інформації.',
@@ -52,7 +52,7 @@ export const LEGAL_CONTENT = {
       'В веб/PWA-версии Netlify предоставляет файлы приложения и может обрабатывать IP-адреса и стандартные журналы запросов для хостинга и безопасности. Для чтения аккаунт не нужен. Авторизованные рецензенты используют временный HttpOnly-cookie после серверной проверки; пароля нет в коде браузера. Офлайн-кеш и прогресс остаются на устройстве, но браузер может удалить их по своим правилам. Местные напоминания доступны в нативных приложениях, не в PWA. Политика PWA также доступна в Настройки → Приватность.',
     ],
     support: [
-      'Выберите номер на карте и нажмите стрелку, чтобы открыть историю. Новые дни открываются 1–24 декабря 2026 года по местному времени устройства. Завершённые истории остаются доступными.',
+      'Нажмите номер на карте, чтобы открыть историю. На сайте день 1 доступен сразу; завершение дня открывает следующий. В приложениях iOS и Android новые дни открываются 1–24 декабря 2026 года по местному времени устройства. Завершённые истории остаются доступными.',
       'Прочитайте Писание, Библейскую историю, Вопросы, Обещание, Связь и Семейное задание. В последнем разделе нажмите «Завершить день». Язык можно менять вверху истории без потери места чтения.',
       'После установки истории работают без интернета. Для YouTube и карты нужно подключение. Если напоминания не работают, проверьте разрешение на уведомления в настройках устройства.',
       'Не удаляйте приложение для исправления ошибки, не сохранив прогресс. Для сообщения об ошибке укажите модель устройства, версию системы и приложения, номер дня и язык. Не отправляйте имена детей или личную информацию.',

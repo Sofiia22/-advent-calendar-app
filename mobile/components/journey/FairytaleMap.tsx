@@ -1,7 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
-import { Image, ImageBackground, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, ImageBackground, Pressable, StyleSheet, Text, View } from "react-native";
+import Svg, { Polyline } from 'react-native-svg';
 import { ADVENT_DAYS } from "../../data/adventDays";
 import { JOURNEY_ART } from "../../data/journeyArt";
 import { LanguageId, useAdvent } from "../../state/AdventContext";
@@ -14,18 +15,30 @@ type Props = { width: number; currentDay: number; completedDays: number[]; langu
 export function FairytaleMap({width,currentDay,completedDays,language,labels,onDayPress}:Props) {
   const { canOpenDay } = useAdvent();
   const [selected,setSelected] = useState(currentDay);
-  const mapWidth = Math.max(1120,width);
-  const height = mapWidth * 2 / 3;
+  const mapWidth = width;
+  const compact = width < 1000;
+  const columns = width < 600 ? 3 : 4;
+  const rows = 24 / columns;
+  const height = compact ? Math.max(rows * 100, width * (columns === 3 ? 2.25 : 1.1)) : mapWidth * 2 / 3;
+  // A vertical winding trail keeps every phone target at full touch size.
+  // Wide screens retain the illustrated landscape's original landmarks.
+  const pointFor = (i: number) => {
+    if (!compact) return POINTS[i];
+    const row = Math.floor(i / columns), column = row % 2 ? columns - 1 - i % columns : i % columns;
+    return [.13 + column * .74 / (columns - 1), .07 + row * .86 / (rows - 1)];
+  };
   const stateFor = (n:number):MilestoneState => completedDays.includes(n)?"completed":canOpenDay(n)?"current":"locked";
   const day = ADVENT_DAYS[selected-1];
   const state = stateFor(selected);
   const stateLabel = (s:MilestoneState) => s==="completed"?labels.completed:s==="current"?labels.current:labels.locked;
-  const hint = language==="uk"?"Гортайте карту ↔ · Оберіть історію":language==="ru"?"Листайте карту ↔ · Выберите историю":"Explore the map ↔ · Choose a story";
+  const hint = language==="uk"?"Натисніть на день, щоб відкрити історію":language==="ru"?"Нажмите на день, чтобы открыть историю":"Tap a day to open its story";
   return <View style={styles.shell}>
     <View style={styles.hint}><Text style={styles.hintText}>{hint}</Text><Text style={styles.legend}>✓ {labels.completed}   ✦ {labels.current}   ♙ {labels.locked}</Text></View>
-    <ScrollView horizontal showsHorizontalScrollIndicator nestedScrollEnabled style={{width}} contentContainerStyle={{width:mapWidth,height}}>
-      <ImageBackground source={require("../../assets/journey/fairytale-map.png")} resizeMode="stretch" style={{width:mapWidth,height}}>
-        {ADVENT_DAYS.map((item,i)=>{const s=stateFor(item.id);return <Pressable key={item.id} accessibilityRole="button" accessibilityLabel={`${labels.day(item.id)}. ${item.title[language]}. ${stateLabel(s)}`} accessibilityState={{selected:selected===item.id}} onPress={()=>setSelected(item.id)} style={({pressed})=>[styles.stop,{left:POINTS[i][0]*mapWidth-32,top:POINTS[i][1]*height-50},selected===item.id&&styles.selected,pressed&&styles.pressed]}>
+      <ImageBackground source={require("../../assets/journey/fairytale-map.png")} resizeMode="cover" style={{width:mapWidth,height}}>
+        {compact && <Svg pointerEvents="none" width={mapWidth} height={height} style={StyleSheet.absoluteFill}>
+          <Polyline points={POINTS.map((_,i)=>{const [x,y]=pointFor(i);return `${x*mapWidth},${y*height}`;}).join(' ')} fill="none" stroke="rgba(255,222,140,.75)" strokeWidth={5} strokeDasharray="6 8" strokeLinejoin="round" />
+        </Svg>}
+        {ADVENT_DAYS.map((item,i)=>{const s=stateFor(item.id);const point=pointFor(i);return <Pressable key={item.id} accessibilityRole="button" accessibilityLabel={`${labels.day(item.id)}. ${item.title[language]}. ${stateLabel(s)}`} accessibilityState={{selected:selected===item.id}} onPress={()=>{setSelected(item.id);onDayPress(item.id,s);}} style={({pressed})=>[styles.stop,{left:point[0]*mapWidth-32,top:point[1]*height-32},selected===item.id&&styles.selected,pressed&&styles.pressed]}>
           <View style={[styles.coin,s==="current"&&styles.currentCoin]}>
             <Image source={JOURNEY_ART[i]} style={styles.art} resizeMode="cover" />
             <LinearGradient colors={["transparent","rgba(38,17,3,.84)"]} style={styles.shade}/>
@@ -35,7 +48,6 @@ export function FairytaleMap({width,currentDay,completedDays,language,labels,onD
           {selected===item.id&&<View style={styles.pointer}/>}
         </Pressable>})}
       </ImageBackground>
-    </ScrollView>
     <View style={styles.detail}>
       <Image source={JOURNEY_ART[selected-1]} style={styles.detailArt}/>
       <View style={styles.copy}><Text style={styles.kicker}>{labels.day(selected)} · {stateLabel(state)}</Text><Text style={styles.title}>{day.title[language]}</Text></View>

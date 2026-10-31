@@ -1,7 +1,7 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { Alert, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { Alert, Platform, ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { MilestoneState } from "../components/journey/PromiseTrail";
@@ -30,7 +30,11 @@ export default function HomeScreen() {
 
   const openDay = (day: number, state: MilestoneState) => {
     if (state === "locked") {
-      Alert.alert(t.notYetTitle, t.notYetMessage);
+      const message = Platform.OS === 'web'
+        ? selectedLanguage === 'uk' ? 'Завершіть попередню історію, щоб відкрити наступну.' : selectedLanguage === 'ru' ? 'Завершите предыдущую историю, чтобы открыть следующую.' : 'Complete the previous story to unlock the next one.'
+        : t.notYetMessage;
+      if (Platform.OS === 'web') window.alert(message);
+      else Alert.alert(t.notYetTitle, message);
       return;
     }
     router.push(`/advent/${day}`);
@@ -75,7 +79,7 @@ export default function HomeScreen() {
             currentDay={currentDay}
             completedDays={completedDays}
             language={selectedLanguage}
-            labels={{ day: t.dayLabel, current: t.today, completed: t.done, locked: t.locked }}
+            labels={{ day: t.dayLabel, current: Platform.OS === 'web' ? selectedLanguage === 'uk' ? 'Доступно' : selectedLanguage === 'ru' ? 'Доступно' : 'Available' : t.today, completed: t.done, locked: t.locked }}
             onDayPress={openDay}
           />
           <View style={styles.trailEnd}>

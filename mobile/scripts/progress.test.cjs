@@ -2,7 +2,24 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const { load } = require('./ts-loader.cjs');
-const { parseCompletedDays, unlockedDay, canOpenDay, addCompletedDay } = load(path.join(__dirname,'../state/progress.ts'));
+const { parseCompletedDays, unlockedDay, canOpenDay, addCompletedDay, availableDayFor } = load(path.join(__dirname,'../state/progress.ts'));
+test('web starts immediately and unlocks only after contiguous completion',()=>{
+  const before=new Date(2026,9,31);
+  assert.equal(availableDayFor('web',[],before),1);
+  assert.equal(availableDayFor('web',[1],before),2);
+  assert.equal(availableDayFor('web',[1,3,24],before),2);
+  assert.equal(availableDayFor('web',Array.from({length:24},(_,i)=>i+1),before),24);
+  assert.equal(availableDayFor('ios',[1,2],before),0);
+  assert.equal(availableDayFor('android',[],new Date(2026,11,5)),5);
+  let completed=[];
+  for(let day=1;day<=24;day++) {
+    const unlocked=availableDayFor('web',completed,before);
+    assert.equal(canOpenDay(day,completed,unlocked),true);
+    if(day<24) assert.equal(canOpenDay(day+1,completed,unlocked),false);
+    completed=Array.from(addCompletedDay(completed,day,unlocked));
+  }
+  assert.equal(completed.length,24);
+});
 test('stored progress is validated, sorted and deduplicated',()=>assert.deepEqual(Array.from(parseCompletedDays('[24,2,2,0,25,"3",1.5,1]')),[1,2,24]));
 test('damaged storage does not crash startup',()=>assert.equal(parseCompletedDays('{broken').length,0));
 test('calendar opens Dec 1 locally, caps at 24 and survives year end',()=>{assert.equal(unlockedDay(new Date(2026,10,30,23,59)),0);assert.equal(unlockedDay(new Date(2026,11,1)),1);assert.equal(unlockedDay(new Date(2026,11,24)),24);assert.equal(unlockedDay(new Date(2027,0,1)),24);});

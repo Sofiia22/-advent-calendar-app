@@ -1,4 +1,4 @@
-// Deterministic vector master; no third-party imagery or generated lettering.
+// Owner-supplied artwork; deterministic icon sizing for native and installed PWA.
 const fs = require('node:fs');
 const path = require('node:path');
 const sharp = require('sharp');
@@ -11,10 +11,12 @@ const icon = wrap('<defs><radialGradient id="night"><stop stop-color="#233762"/>
 async function main(){
   await sharp({create:{width:1,height:1,channels:4,background:{r:0,g:0,b:0,alpha:0}}}).png().toFile(path.join(out,'splash-transparent.png'));
   fs.writeFileSync(path.join(out,'app-icon.svg'),icon);
-  await sharp(Buffer.from(icon)).flatten({background:'#101A3A'}).png().toFile(path.join(out,'app-icon.png'));
-  await sharp(Buffer.from(wrap(`<g transform="translate(154 154) scale(.7)">${star+book}</g>`))).png().toFile(path.join(out,'adaptive-icon.png'));
+  const source=path.join(out,'app-icon-source.png');
+  await sharp(source).resize(1024,1024).flatten({background:'#101A3A'}).png().toFile(path.join(out,'app-icon.png'));
+  // Keep the complete supplied picture inside Android's adaptive safe zone.
+  await sharp(source).resize(640,640).extend({top:192,bottom:192,left:192,right:192,background:'#101A3A'}).png().toFile(path.join(out,'adaptive-icon.png'));
   await sharp(Buffer.from(wrap(`<g transform="translate(154 154) scale(.7)">${star+book}</g>`))).ensureAlpha().tint('#FFFFFF').png().toFile(path.join(out,'monochrome-icon.png'));
-  await sharp(Buffer.from(icon)).resize(512,512).flatten({background:'#101A3A'}).png().toFile(path.join(out,'play-icon-512.png'));
+  await sharp(source).resize(512,512).flatten({background:'#101A3A'}).png().toFile(path.join(out,'play-icon-512.png'));
   const feature=wrap('<path fill="#101A3A" d="M0 0H1024V1024H0Z"/>'+star+book);
   await sharp(Buffer.from(feature)).resize(500,500).extend({left:262,right:262,top:0,bottom:0,background:'#101A3A'}).flatten({background:'#101A3A'}).png().toFile(path.join(out,'play-feature-1024x500.png'));
   console.log('Generated 1024px app icon, adaptive/monochrome assets, Play icon and feature graphic.');

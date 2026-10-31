@@ -14,6 +14,16 @@ export function unlockedDay(now = new Date()): number {
   return Math.max(0, Math.min(dayCount, Math.floor((localDay - start) / 86400000) + 1));
 }
 
+// Only a contiguous run of completed stories unlocks the next web story.
+export function progressUnlockedDay(completed: readonly number[]): number {
+  for (let day = 1; day <= 24; day++) if (!completed.includes(day)) return day;
+  return 24;
+}
+
+export function availableDayFor(platform: string, completed: readonly number[], now = new Date()): number {
+  return platform === 'web' ? progressUnlockedDay(completed) : unlockedDay(now);
+}
+
 export function canOpenDay(day: number, completed: readonly number[], unlocked: number, testing = false): boolean {
   return Number.isInteger(day) && day >= 1 && day <= 24 && (testing || completed.includes(day) || day <= unlocked);
 }
