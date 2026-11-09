@@ -10,6 +10,8 @@ import { DAY_ONE_CONTENT, DAY_ONE_ICONS, DAY_ONE_STORY_IMAGES, IllustratedDayCon
 import { LanguageId, useAdvent } from "../../state/AdventContext";
 import { colors, fonts, radius, shadows } from "../../theme/tokens";
 import { useAppFonts } from "../../theme/useAppFonts";
+import { DayHeader } from './DayHeader';
+import { StoryBook } from './StoryBook';
 
 const TONES = [
   { backgroundColor: "#F0F9FC", borderColor: "#C9E6EE" },
@@ -214,26 +216,17 @@ export function IllustratedDayScreen({ dayNumber, contentByLanguage, icons, stor
     selectSection(activeSection - 1);
   };
 
+  if (activeSection === 1) return <StoryBook
+    title={`${content.dayLabel} · ${content.sectionTitles.bibleStory}`}
+    language={selectedLanguage} onLanguage={l=>void setLanguage(l)}
+    onClose={()=>selectSection(0)} onFinish={()=>selectSection(2)}
+    pages={content.storyPages.map((page,index)=>{const imageIndex=page.imageIndex===undefined?index:page.imageIndex;return {title:page.title,paragraphs:page.paragraphs,image:imageIndex===null?undefined:storyImages[imageIndex]};})}
+  />;
+
   return (
     <SafeAreaView edges={["top"]} style={styles.safeArea}>
       <StatusBar style="light" />
-      <LinearGradient colors={["#14254B", "#315E7B", "#76B8C7"]} end={{ x: 1, y: 1 }} style={styles.header}>
-        <Pressable accessibilityLabel={content.navigation.back} onPress={() => router.canGoBack() ? router.back() : router.replace('/home')} style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}>
-          <Ionicons name="chevron-back" size={24} color={colors.white} />
-        </Pressable>
-        <View style={styles.dayBadge}><Text style={styles.dayBadgeText}>{content.dayLabel}</Text></View>
-        <Text style={styles.heroTitle}>{content.title}</Text>
-        <Text style={styles.heroSubtitle}>{content.subtitle}</Text>
-        {(
-          <View style={styles.languageChoices}>
-            {([{ id: "uk", label: "Українська" }, { id: "en", label: "English" }, { id: "ru", label: "Русский" }] as const).map((language) => (
-              <Pressable key={language.id} accessibilityRole="button" accessibilityState={{ selected: selectedLanguage === language.id }} onPress={() => void setLanguage(language.id)} style={[styles.languageChoice, selectedLanguage === language.id && styles.languageChoiceSelected]}>
-                <Text style={styles.languageChoiceText}>{language.label}</Text>
-              </Pressable>
-            ))}
-          </View>
-        )}
-      </LinearGradient>
+      <DayHeader day={content.dayLabel} title={content.title} backLabel={content.navigation.back} language={selectedLanguage} onLanguage={l=>void setLanguage(l)} onBack={()=>router.canGoBack()?router.back():router.replace('/home')}/>
 
       <View style={styles.tabBar}>
         <ScrollView ref={tabsRef} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabRail}>

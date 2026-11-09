@@ -14,6 +14,8 @@ import { getTranslations } from '../../i18n/translations';
 import { useAdvent } from "../../state/AdventContext";
 import { colors, fonts, radius, shadows } from "../../theme/tokens";
 import { useAppFonts } from "../../theme/useAppFonts";
+import { DayHeader } from './DayHeader';
+import { StoryBook } from './StoryBook';
 
 const getSections = (DAY_TWO: typeof DAY_TWO_BY_LANGUAGE[keyof typeof DAY_TWO_BY_LANGUAGE]) => [
   { title: DAY_TWO.scripture.title, icon: DAY_TWO.icons.scripture },
@@ -181,20 +183,15 @@ export function DayTwoScreen() {
     ? `${t.next}: ${SECTIONS[activeSection + 1].title}`
     : isCompleted ? t.backToCalendar : t.completeDay(2);
 
+  if(activeSection===1) return <StoryBook title={`${DAY_TWO.dayLabel} · ${DAY_TWO.bibleStory.title}`} language={selectedLanguage} onLanguage={l=>void setLanguage(l)} onClose={()=>selectSection(0)} onFinish={()=>selectSection(2)} pages={[
+    {title:DAY_TWO.bibleStory.title,paragraphs:[DAY_TWO.bibleStory.intro]},
+    ...DAY_TWO.bibleStory.moments.map((moment,index)=>({title:moment.caption,image:moment.image,paragraphs:DAY_TWO.bibleStory.paragraphs.slice(Math.floor(index*DAY_TWO.bibleStory.paragraphs.length/DAY_TWO.bibleStory.moments.length),Math.floor((index+1)*DAY_TWO.bibleStory.paragraphs.length/DAY_TWO.bibleStory.moments.length))})),
+  ]}/>;
+
   return (
     <SafeAreaView edges={["top"]} style={styles.safeArea}>
       <StatusBar style="light" />
-      <LinearGradient colors={["#14254B", "#315E7B", "#76B8C7"]} end={{ x: 1, y: 1 }} style={styles.header}>
-        <Pressable accessibilityLabel={t.goBack} onPress={() => router.canGoBack() ? router.back() : router.replace('/home')} style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}>
-          <Ionicons name="chevron-back" size={24} color={colors.white} />
-        </Pressable>
-        <View style={styles.dayBadge}><Text style={styles.dayBadgeText}>{DAY_TWO.dayLabel}</Text></View>
-        <Text style={styles.heroTitle}>{DAY_TWO.title}</Text>
-        <Text style={styles.heroSubtitle}>{DAY_TWO.subtitle}</Text>
-        <View style={{ flexDirection: 'row', gap: 14, marginTop: 12 }}>
-          {(['uk','en','ru'] as const).map(lang => <Pressable key={lang} accessibilityRole="button" accessibilityState={{ selected: selectedLanguage === lang }} onPress={() => void setLanguage(lang)}><Text style={{ color: colors.white, padding: 8 }}>{lang === 'uk' ? 'Українська' : lang === 'ru' ? 'Русский' : 'English'}</Text></Pressable>)}
-        </View>
-      </LinearGradient>
+      <DayHeader day={DAY_TWO.dayLabel} title={DAY_TWO.title} backLabel={t.goBack} language={selectedLanguage} onLanguage={l=>void setLanguage(l)} onBack={()=>router.canGoBack()?router.back():router.replace('/home')}/>
 
       <View style={styles.tabBar}>
         <ScrollView ref={tabsRef} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabRail}>
