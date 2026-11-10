@@ -20,7 +20,7 @@ const STARS = [
 
 export default function HomeScreen() {
   const { width } = useWindowDimensions();
-  const { completedDays, currentDay, availableDay, isPreview, isHydrated, selectedLanguage } = useAdvent();
+  const { completedDays, currentDay, isHydrated, selectedLanguage } = useAdvent();
   const [fontsLoaded] = useAppFonts();
   const t = getTranslations(selectedLanguage);
   const trailWidth = Math.min(width, 1536);
@@ -30,9 +30,7 @@ export default function HomeScreen() {
 
   const openDay = (day: number, state: MilestoneState) => {
     if (state === "locked") {
-      const message = Platform.OS === 'web'
-        ? selectedLanguage === 'uk' ? 'Завершіть попередню історію, щоб відкрити наступну.' : selectedLanguage === 'ru' ? 'Завершите предыдущую историю, чтобы открыть следующую.' : 'Complete the previous story to unlock the next one.'
-        : t.notYetMessage;
+      const message = selectedLanguage === 'uk' ? 'Завершіть попередню історію, щоб відкрити наступну.' : selectedLanguage === 'ru' ? 'Завершите предыдущую историю, чтобы открыть следующую.' : 'Complete the previous story to unlock the next one.';
       if (Platform.OS === 'web') window.alert(message);
       else Alert.alert(t.notYetTitle, message);
       return;
@@ -69,7 +67,6 @@ export default function HomeScreen() {
               ))}
             </View>
           </View>
-          {availableDay===0&&!isPreview&&<Text style={{color:'#fff4d9',fontSize:17,marginTop:16}}>{selectedLanguage==='uk'?'Ласкаво просимо! Подорож почнеться 1 грудня 2026 року.':selectedLanguage==='ru'?'Добро пожаловать! Путешествие начнётся 1 декабря 2026 года.':'Welcome! Your journey begins December 1, 2026.'}</Text>}
         </LinearGradient>
 
 
@@ -79,7 +76,7 @@ export default function HomeScreen() {
             currentDay={currentDay}
             completedDays={completedDays}
             language={selectedLanguage}
-            labels={{ day: t.dayLabel, current: Platform.OS === 'web' ? selectedLanguage === 'uk' ? 'Доступно' : selectedLanguage === 'ru' ? 'Доступно' : 'Available' : t.today, completed: t.done, locked: t.locked }}
+            labels={{ day: t.dayLabel, current: selectedLanguage === 'uk' ? 'Доступно' : selectedLanguage === 'ru' ? 'Доступно' : 'Available', completed: t.done, locked: t.locked }}
             onDayPress={openDay}
           />
           <View style={styles.trailEnd}>

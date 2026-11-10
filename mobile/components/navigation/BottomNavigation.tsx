@@ -11,7 +11,7 @@ const ITEMS = [
   { path: "/home", icon: "trail-sign-outline" as const, key: "journey" as const },
   { path: "/church", icon: "home-outline" as const, key: "church" as const },
   { path: "/settings", icon: "settings-outline" as const, key: "settings" as const },
-];
+] as const;
 
 export function BottomNavigation() {
   const pathname = usePathname();

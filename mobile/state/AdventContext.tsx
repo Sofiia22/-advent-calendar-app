@@ -9,10 +9,10 @@ import {
   useState,
   useRef,
 } from "react";
-import { Alert, AppState, Platform } from 'react-native';
+import { Alert, Platform } from 'react-native';
 import { TESTING_UNLOCK } from '../config/testing';
 import { useReviewerAccess } from '../web/reviewerAccess';
-import { addCompletedDay, availableDayFor, canOpenDay, parseCompletedDays, unlockedDay } from './progress';
+import { addCompletedDay, availableDayFor, canOpenDay, parseCompletedDays } from './progress';
 
 export type LanguageId = "en" | "uk" | "ru";
 
@@ -76,16 +76,9 @@ export function AdventProvider({ children }: AdventProviderProps) {
   const [previewRequested, setPreview] = useState(false);
   const reviewAuthorized = useReviewerAccess();
   const isPreview = previewRequested && reviewAuthorized;
-  const [availableDay, setAvailableDay] = useState(() => TESTING_UNLOCK ? 24 : unlockedDay());
   const completedRef = useRef<number[]>([]);
   const storageLoaded = useRef(false);
   const writeQueue = useRef(Promise.resolve());
-  useEffect(() => {
-    const refresh = () => setAvailableDay(TESTING_UNLOCK ? 24 : unlockedDay());
-    const subscription = AppState.addEventListener('change', state => { if (state === 'active') refresh(); });
-    const timer = setInterval(refresh, 60000);
-    return () => { subscription.remove(); clearInterval(timer); };
-  }, []);
 
   useEffect(() => {
     const loadStoredState = async () => {
@@ -177,7 +170,7 @@ export function AdventProvider({ children }: AdventProviderProps) {
       (day) => !completedDays.includes(day),
     ) ?? 24;
   const currentDay = firstIncomplete;
-  const effectiveAvailableDay = Platform.OS === 'web' ? availableDayFor('web', completedDays) : availableDay;
+  const effectiveAvailableDay = availableDayFor(Platform.OS, completedDays);
   const canOpen = useCallback((day: number) => canOpenDay(day, completedDays, effectiveAvailableDay, TESTING_UNLOCK || isPreview), [completedDays, effectiveAvailableDay, isPreview]);
 
   const value = useMemo<AdventContextValue>(
